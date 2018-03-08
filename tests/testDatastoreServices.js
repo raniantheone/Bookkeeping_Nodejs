@@ -3,6 +3,9 @@ var depoFactory = require("../businessProcesses/models/depository");
 var mngAccFactory = require("../businessProcesses/models/managingAccount");
 var datastoreSvc = require("../services/datastoreService");
 
+var chai = require('chai');
+var assert = chai.assert;
+
 // var p = datastoreSvc.queryDepoMngAccAndPreselect("trista167@gmail.com");
 
 // var p = datastoreSvc.saveUserPrefs("raniantheone@gmail.com", [{greeting: "whatzup"}, {food: "bbq"}]);
@@ -71,9 +74,15 @@ var datastoreSvc = require("../services/datastoreService");
 
 // var p = datastoreSvc.queryInitIncomeRecord("trista167@gmail.com");
 
-p.then((dbData) => {
-  console.log("oper success");
-  console.log(dbData);
-}).catch((err) => {
-  console.log(err);
+describe("trying mocha", function() {
+  it("should find a mngAcc", async function() {
+    assert.lengthOf(await datastoreSvc.queryInitIncomeRecord("trista167@gmail.com"), 1);
+  });
 });
+
+// p.then((dbData) => {
+//   console.log("oper success");
+//   console.log(dbData);
+// }).catch((err) => {
+//   console.log(err);
+// });

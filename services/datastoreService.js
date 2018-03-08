@@ -401,12 +401,54 @@ exports.insertIncomeRecord = async function(incomeRecord) {
   return new Promise((resolve, reject) => {
     bucket.insert(incomeRecord.id, incomeRecord, (err, result) => {
       if (!err) {
-        console.log("stored document successfully. CAS is %j", result.cas);
+        console.log("insert income record successfully. CAS is %j", result.cas);
         resolve(true);
       } else {
-        console.error("Couldn't store document: %j", err);
+        console.error("Couldn't insert income record: %j", err);
         reject(err);
       }
     });
+  });
+}
+
+exports.querySystemConfig = async function() {
+  return new Promise((resolve, reject) => {
+    bucket.get(
+      "system::config",
+      (err, res) => {
+        if (!err) {
+          console.log("query system config successfully");
+          console.log(res.value);
+          resolve(res.value);
+        } else {
+          console.error("Couldn't query system config: %j", err);
+          reject(err);
+        }
+      }
+    )
+  });
+}
+
+exports.queryInitIncomeRecord = async function(ownerId) {
+  return new Promise((resolve, reject) => {
+    let N1qlQuery = couchbase.N1qlQuery;
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND type = 'income' AND transType = 'init';");
+    bucket.query(
+      queryStr,
+      [ownerId],
+      (err, res) => {
+        if (!err) {
+          res = res.map((entry) => {
+            return entry.bookkeeping;
+          });
+          console.log("query init income record successfully");
+          console.log(res);
+          resolve(res);
+        } else {
+          console.error("Couldn't query init income record: %j", err);
+          reject(err);
+        }
+      }
+    );
   });
 }

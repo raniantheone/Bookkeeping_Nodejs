@@ -67,6 +67,10 @@ var datastoreSvc = require("../services/datastoreService");
 
 // var p = datastoreSvc.deleteInitRecord("trista167@gmail.com", "trista167@gmail.com::depo::633596129", "trista167@gmail.com::mngAcc::535076123");
 
+// var p = datastoreSvc.querySystemConfig();
+
+// var p = datastoreSvc.queryInitIncomeRecord("trista167@gmail.com");
+
 p.then((dbData) => {
   console.log("oper success");
   console.log(dbData);

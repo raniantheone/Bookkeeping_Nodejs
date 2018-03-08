@@ -12,7 +12,7 @@ router.post("/expense/keepRecord", expenseController.keepExpenseRecord);
 // Serve initialized depo-mngAcc combo, user preferance, and mapping for depo and mngAcc
 router.post("/income/getAvailDepoMngAccAndPref", incomeController.getInitDepoMngAccAndPref);
 
-// Keep expense record
-// router.post("/income/keepRecord", incomeController.keepIncomeRecord);
+// Keep income record
+router.post("/income/keepRecord", incomeController.keepIncomeRecord);
 
 module.exports = router;

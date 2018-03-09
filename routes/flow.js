@@ -15,4 +15,10 @@ router.post("/income/getAvailDepoMngAccAndPref", incomeController.getInitDepoMng
 // Keep income record
 router.post("/income/keepRecord", incomeController.keepIncomeRecord);
 
+// Serve transferable depo-mngAcc and its current balance
+// router.post("/transfer/getTransferableDepoMngAcc", transferController.getTransferableDepoMngAcc);
+
+// Transfer money from source depo-mngAcc to target depo-mngAcc
+// router.post("/transfer/transferAmount", transferController.);
+
 module.exports = router;

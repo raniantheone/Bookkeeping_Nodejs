@@ -25,7 +25,7 @@ exports.queryDepoMngAccAndPreselect = async function(ownerId) {
 
 exports.insertExpenseRecord = async function(expenseRecord) {
   return new Promise((resolve, reject) => {
-    bucket.insert(expenseRecord.getDatastoreId(), expenseRecord, (err, result) => {
+    bucket.insert(expenseRecord.id, expenseRecord, (err, result) => {
       if (!err) {
         console.log("stored document successfully. CAS is %j", result.cas);
         resolve(true);
@@ -178,6 +178,7 @@ exports.queryDepoMngAccWithInitValue = async function(ownerId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
     let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND (type = 'mngAcc' OR type = 'depo' OR (type = 'income' AND transType = 'init'));");
+    queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
       [ownerId],
@@ -446,6 +447,46 @@ exports.queryInitIncomeRecord = async function(ownerId) {
           resolve(res);
         } else {
           console.error("Couldn't query init income record: %j", err);
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+exports.queryDepoMngAccBalanceParts = async function(depoId, mngAccId, initDateTime) {
+  return new Promise((resolve, reject) => {
+    let N1qlQuery = couchbase.N1qlQuery;
+    let queryStr = N1qlQuery.fromString("SELECT transType, SUM(transAmount) as total FROM `bookkeeping` WHERE ((type = 'income' AND transType = 'init') OR (type = 'income' AND transType = 'income' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'expense' AND transDateTime >= $3)) AND (depo = $1 AND mngAcc = $2) GROUP BY transType;");
+    queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+    bucket.query(
+      queryStr,
+      [depoId, mngAccId, initDateTime],
+      (err, res) => {
+        if (!err) {
+          console.log("query balance parts of %s - %s after %s successfully", depoId, mngAccId, initDateTime);
+          console.log(res);
+          resolve(res);
+        } else {
+          console.error("Couldn't query balance parts: %j", err);
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+exports.deleteDocumentById = async function(documentId) {
+  return new Promise((resolve, reject) => {
+    bucket.remove(
+      documentId,
+      (err, res) => {
+        if (!err) {
+          console.log("delete %s successfully", documentId);
+          console.log(res);
+          resolve(true);
+        } else {
+          console.error("Couldn't delete document: %j", err);
           reject(err);
         }
       }

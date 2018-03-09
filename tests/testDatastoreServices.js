@@ -74,12 +74,14 @@ var assert = chai.assert;
 
 // var p = datastoreSvc.queryInitIncomeRecord("trista167@gmail.com");
 
-describe("trying mocha", function() {
-  it("should find a mngAcc", async function() {
-    assert.lengthOf(await datastoreSvc.queryInitIncomeRecord("trista167@gmail.com"), 1);
-  });
-});
+// describe("trying mocha", function() {
+//   it("should find a mngAcc", async function() {
+//     assert.lengthOf(await datastoreSvc.queryInitIncomeRecord("trista167@gmail.com"), 1);
+//   });
+// });
 
+// var p = datastoreSvc.deleteDocumentById("somebody@test.org::income::20180309::2326958761");
+//
 // p.then((dbData) => {
 //   console.log("oper success");
 //   console.log(dbData);

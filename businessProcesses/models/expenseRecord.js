@@ -17,8 +17,5 @@ function ExpenseRecord(ownerId, editorIds, viewerIds, itemName, itemDesc, transA
   this.transIssuer = transIssuer;
   this.depo = depo;
   this.mngAcc = mngAcc;
-  let datastoreId = this.ownerId + "::" + this.type + "::" + this.transDateTime.toISOString().split("T")[0].replace(/-/gi, "") + "::" + hashUtil.simpleHash(this.itemName + this.itemDesc + this.transAmount + this.depo + this.mngAcc + this.transType + this.transDateTime);
-  this.getDatastoreId = function() {
-    return datastoreId;
-  }
+  this.id = this.ownerId + "::" + this.type + "::" + this.transDateTime.toISOString().split("T")[0].replace(/-/gi, "") + "::" + hashUtil.simpleHash(this.itemName + this.itemDesc + this.transAmount + this.depo + this.mngAcc + this.transType + this.transDateTime);
 };

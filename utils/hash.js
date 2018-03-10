@@ -1,3 +1,6 @@
+// var md5 = require("md5");
+// TODO Add md5 method for password hashing
+
 exports.simpleHash = function(str) {
   var hash = 0, i, chr;
   if (str.length === 0) return hash;

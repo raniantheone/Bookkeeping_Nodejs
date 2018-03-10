@@ -493,3 +493,22 @@ exports.deleteDocumentById = async function(documentId) {
     );
   });
 }
+
+exports.insertUser = async function(user) {
+  return new Promise((resolve, reject) => {
+    bucket.insert(
+      user.id,
+      user,
+      (err, res) => {
+        if (!err) {
+          console.log("insert user %s successfully", user.id);
+          console.log(res);
+          resolve(true);
+        } else {
+          console.error("Couldn't insert user: %j", user.id);
+          reject(err);
+        }
+      }
+    );
+  });
+}

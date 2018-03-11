@@ -13,7 +13,8 @@ exports.ownerIdExists = async function(ownerId) {
   return itExists;
 }
 
-exports.getInitDepoMngAccWithBalance = async function(ownerId) {
+exports.getInitDepoMngAccWithBalance = getInitDepoMngAccWithBalance;
+async function getInitDepoMngAccWithBalance(ownerId) {
   console.log("getInitDepoMngAccWithBalance invoked with %s", ownerId);
   var result = {
     depos: [],
@@ -64,4 +65,29 @@ exports.getInitDepoMngAccWithBalance = async function(ownerId) {
     console.log(err + " <-- err happend; process layer consumes it and returns default value");
   }
   return result;
+}
+
+exports.isValidAmtFromSourceToTargetOfTheOwner = async function(ownerId, sourceDepoId, sourceMngAccId, targetDepoId, targetMngAcc, transAmount) {
+  var passedCheck = false;
+  try {
+    var initDataWithBalance = await getInitDepoMngAccWithBalance(ownerId);
+    var availDepoIds = initDataWithBalance.depos.map((entry) => { return entry.id });
+    var availMngAccs = initDataWithBalance.mngAccs.map((entry) => { return entry.id });
+    var source = initDataWithBalance.initializedDataArr.filter(
+      (initEntry) => { return initEntry.depoId == sourceDepoId && initEntry.mngAccId == sourceMngAccId }
+    );
+    var target = initDataWithBalance.initializedDataArr.filter(
+      (initEntry) => { return initEntry.depoId == targetDepoId && initEntry.mngAccId == targetMngAcc }
+    );
+    passedCheck = availDepoIds.includes(sourceDepoId)
+      && availDepoIds.includes(sourceDepoId)
+      && availMngAccs.includes(sourceMngAccId)
+      && availMngAccs.includes(targetMngAcc)
+      && source.length == 1
+      && source[0].currentBalance >= transAmount
+      && target.length == 1;
+  } catch(err) {
+    console.log(err + " <-- err happend; process layer consumes it and returns default value");
+  }
+  return passedCheck;
 }

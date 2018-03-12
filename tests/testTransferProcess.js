@@ -13,7 +13,7 @@ describe("#transferProcess.ownerIdExists", function() {
     var res = await transferProc.ownerIdExists("trista167@gmail.com");
     assert.equal(res, true)
   });
-  it("finding an not existing user, should return false", async function() {
+  it("Finding an not existing user, should return false", async function() {
     var res = await transferProc.ownerIdExists("nobody@gmail.com");
     assert.equal(res, false)
   });

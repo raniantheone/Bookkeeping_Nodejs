@@ -43,21 +43,22 @@ async function getInitDepoMngAccWithBalance(ownerId) {
         currentBalance: null
       }
 
-      var expenseTotal = null;
-      var incomeTotal = null;
-      var initValue = null;
+      var expenseTotal = 0;
+      var incomeTotal = 0;
+      var initValue = 0;
       var balanceParts = await datastoreSvc.queryDepoMngAccBalanceParts(entry.depo, entry.mngAcc, entry.transDateTime);
       balanceParts.forEach((part) => {
-        if(part.transType == "expense") {
-          expenseTotal = part.total;
-        }else if(part.transType == "income") {
-          incomeTotal = part.total;
+        if((part.type == "expense" && part.transType == "expense") || (part.type == "expense" && part.transType == "transfer")) {
+          expenseTotal += part.total;
+        }else if((part.type == "income" && part.transType == "income") || (part.type == "income" && part.transType == "transfer")) {
+          incomeTotal += part.total;
         }else if(part.transType == "init") {
           initValue = part.total;
         }
       });
       initializedData.currentBalance = initValue + incomeTotal - expenseTotal;
       result.initializedDataArr.push(initializedData);
+      console.log("init %s + in total %s - exp total %s = %s", initValue, incomeTotal, expenseTotal, initializedData.currentBalance);
 
     }
 
@@ -94,15 +95,71 @@ exports.isValidAmtFromSourceToTargetOfTheOwner = async function(ownerId, sourceD
 
 exports.transferFromSourceToTarget = async function(ownerId, sourceDepoId, sourceMngAccId, targetDepoId, targetMngAccId, transAmount) {
   var transferSuccess = false;
+  var outboundTransferRecord = null;
+  var outboundSuccess = false;
+  var inboundTransferRecord = null;
+  var inboundSuccess = false;
   try {
-    // insertExpenseRecord
-  } catch(err) {
 
-  }
-  try {
-    // insertIncomeRecord
-  } catch(err) {
+    var depos = await datastoreSvc.queryAvailableDepos(ownerId);
+    var mngAccs = await datastoreSvc.queryAvailableMngAccs(ownerId);
 
+    outboundTransferRecord = expenseRecordFactory.buildExpenseRecord(
+      ownerId
+      , []
+      , []
+      , "transfer to " + depos.filter((depo) => { return depo.id == targetDepoId; }).reduce((res) => { return res.displayName; }) + " - " + mngAccs.filter((mngAcc) => { return mngAcc.id == targetMngAccId; }).reduce((res) => { return res.displayName })
+      , "transfer"
+      , transAmount
+      , new Date()
+      , "transfer"
+      , ownerId
+      , sourceDepoId
+      , sourceMngAccId
+    );
+    outboundSuccess = await datastoreSvc.insertExpenseRecord(outboundTransferRecord);
+    if(!outboundSuccess) {
+      throw "failed to create outbound transfer record, abort transfer process now";
+    }
+
+    inboundTransferRecord = incomeRecordFactory.buildIncomeRecord(
+      ownerId
+      , []
+      , []
+      , "transfer from " + depos.filter((depo) => { return depo.id == sourceDepoId; }).reduce((res) => { return res.displayName; }) + " - " + mngAccs.filter((mngAcc) => { return mngAcc.id == sourceMngAccId; }).reduce((res) => { return res.displayName })
+      , "transfer"
+      , transAmount
+      , new Date()
+      , "transfer"
+      , ownerId
+      , targetDepoId
+      , targetMngAccId
+    );
+    inboundSuccess = await datastoreSvc.insertIncomeRecord(inboundTransferRecord);
+    if(!inboundSuccess) {
+      throw "failed to create inbound transfer record, abort transfer process now";
+    }
+
+    transferSuccess = outboundSuccess && inboundSuccess;
+
+  } catch(err) {
+    // TODO test this revert process
+    try {
+      // delete outbound, inbound record if the whole process failed
+      if(outboundTransferRecord != null && !outboundSuccess) {
+        await datastoreSvc.deleteDocumentById(outboundTransferRecord.id);
+        console.log("err %s happened, revert transfer outbound record %s", err, outboundTransferRecord.id);
+      }
+      if(inboundTransferRecord != null && !inboundSuccess) {
+        await datastoreSvc.deleteDocumentById(inboundTransferRecord.id);
+        console.log("err %s happened, revert transfer inbound record %s", err, inboundTransferRecord.id);
+      }
+      if(outboundTransferRecord == null && inboundTransferRecord == null) {
+        console.log("err %s happend, but neither outbound nor inbound record is created", err);
+      }
+    } catch(err) {
+      console.log("cannot complete #transferFromSourceToTarget, and revert process failed as well, could be serious issue, please check the err %", err);
+    }
   }
   return transferSuccess;
 }

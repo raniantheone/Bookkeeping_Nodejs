@@ -457,7 +457,7 @@ exports.queryInitIncomeRecord = async function(ownerId) {
 exports.queryDepoMngAccBalanceParts = async function(depoId, mngAccId, initDateTime) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT transType, SUM(transAmount) as total FROM `bookkeeping` WHERE ((type = 'income' AND transType = 'init') OR (type = 'income' AND transType = 'income' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'expense' AND transDateTime >= $3)) AND (depo = $1 AND mngAcc = $2) GROUP BY transType;");
+    let queryStr = N1qlQuery.fromString("SELECT type, transType, SUM(transAmount) as total FROM `bookkeeping` WHERE ((type = 'income' AND transType = 'init') OR (type = 'income' AND transType = 'income' AND transDateTime >= $3) OR (type = 'income' AND transType = 'transfer' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'expense' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'transfer' AND transDateTime >= $3)) AND (depo = $1 AND mngAcc = $2) GROUP BY type, transType;");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,

@@ -180,7 +180,7 @@ describe("#transferProcess", function() {
 
     });
 
-    it("Should balance of 55 under depoA and mngAccA, and balance of 509 under depoB and mngAccB", async function() {
+    it("Should get balance of 55 under depoA and mngAccA, and balance of 509 under depoB and mngAccB", async function() {
 
       var res = await transferProc.getInitDepoMngAccWithBalance("somebody@test.org");
 
@@ -224,7 +224,7 @@ describe("#transferProcess", function() {
       assert.equal(res, false, "transfer amount greater than source balance get passed check");
     });
 
-    it("Should be valid with correct user, source, target, and acceptable transfer amout", async function() {
+    it("Should be valid with correct user, source, target, and acceptable transfer amount", async function() {
       var res = await transferProc.isValidAmtFromSourceToTargetOfTheOwner("somebody@test.org", testDepoId_B, testMngAccId_B, testDepoId_A, testMngAccId_A, 100);
       assert.equal(res, true, "all input is valid but did not pass check");
     });
@@ -235,12 +235,12 @@ describe("#transferProcess", function() {
 
     // scenario: transfer money from testB to testA
 
-    it("Source balance should be 409 after transfer, and target balance should be 155", function() {
+    it("Source balance should be 409 after transfer, and target balance should be 155", async function() {
 
-      var transSuccess = transferProc.transferFromSourceToTarget("somebody@test.org", testDepoId_B, testMngAccId_B, testDepoId_A, testMngAccId_A, 100);
+      var transSuccess = await transferProc.transferFromSourceToTarget("somebody@test.org", testDepoId_B, testMngAccId_B, testDepoId_A, testMngAccId_A, 100);
       assert.equal(transSuccess, true, "transfer failed with correct input");
 
-      var depoMngAccAndBalanceData = transferProc.getInitDepoMngAccWithBalance("somebody@test.org");
+      var depoMngAccAndBalanceData = await transferProc.getInitDepoMngAccWithBalance("somebody@test.org");
       var sourceBalanceData = depoMngAccAndBalanceData.initializedDataArr.filter((initializedData) => {
         return initializedData.depoId == testDepoId_B && initializedData.mngAccId == testMngAccId_B;
       }).reduce((source) => {
@@ -251,7 +251,7 @@ describe("#transferProcess", function() {
       }).reduce((target) => {
         return target;
       });
-      assert.eqaul(409, sourceBalanceData.currentBalance, "source balance is not 409 after transfer");
+      assert.equal(409, sourceBalanceData.currentBalance, "source balance is not 409 after transfer");
       assert.equal(155, targetBalanceData.currentBalance, "target balance is not 155 after transfer");
 
     });

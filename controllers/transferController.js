@@ -76,8 +76,7 @@ exports.transferAmount = async function(req, res) {
     ]);
 
     if(checkResult.allValidated) {
-      // TODO transfer process to be implemented
-      // respContent.payload = await transferProc;
+      respContent.payload = await transferProc.transferFromSourceToTarget(req.body.ownerId, req.body.sourceDepo, req.body.sourceMngAcc, req.body.targetDepo, req.body.targetMngAcc, req.body.transAmount);
     } else {
       respContent.payload = checkResult.allGuards.filter(function(guard) {
         return !guard.isValid;

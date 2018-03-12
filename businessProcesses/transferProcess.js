@@ -91,3 +91,18 @@ exports.isValidAmtFromSourceToTargetOfTheOwner = async function(ownerId, sourceD
   }
   return passedCheck;
 }
+
+exports.transferFromSourceToTarget = async function(ownerId, sourceDepoId, sourceMngAccId, targetDepoId, targetMngAccId, transAmount) {
+  var transferSuccess = false;
+  try {
+    // insertExpenseRecord
+  } catch(err) {
+
+  }
+  try {
+    // insertIncomeRecord
+  } catch(err) {
+
+  }
+  return transferSuccess;
+}

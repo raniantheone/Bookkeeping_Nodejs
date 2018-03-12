@@ -231,6 +231,40 @@ describe("#transferProcess", function() {
 
   });
 
+  describe("#transferFromSourceToTarget", function() {
+
+    // scenario: transfer money from testB to testA
+
+    it("Source balance should be 409 after transfer, and target balance should be 155", function() {
+
+      var transSuccess = transferProc.transferFromSourceToTarget("somebody@test.org", testDepoId_B, testMngAccId_B, testDepoId_A, testMngAccId_A, 100);
+      assert.equal(transSuccess, true, "transfer failed with correct input");
+
+      var depoMngAccAndBalanceData = transferProc.getInitDepoMngAccWithBalance("somebody@test.org");
+      var sourceBalanceData = depoMngAccAndBalanceData.initializedDataArr.filter((initializedData) => {
+        return initializedData.depoId == testDepoId_B && initializedData.mngAccId == testMngAccId_B;
+      }).reduce((source) => {
+        return source;
+      });
+      var targetBalanceData = depoMngAccAndBalanceData.initializedDataArr.filter((initializedData) => {
+        return initializedData.depoId == testDepoId_A && initializedData.mngAccId == testMngAccId_A;
+      }).reduce((target) => {
+        return target;
+      });
+      assert.eqaul(409, sourceBalanceData.currentBalance, "source balance is not 409 after transfer");
+      assert.equal(155, targetBalanceData.currentBalance, "target balance is not 155 after transfer");
+
+    });
+
+    after(async function() {
+      var transferRecords = await datastoreSvc.queryTransferRecords("somebody@test.org");
+      for(let record of transferRecords) {
+        await datastoreSvc.deleteDocumentById(record.id);
+      }
+    });
+
+  });
+
   after(async function() {
 
     await datastoreSvc.deleteDocumentById(testUserId);

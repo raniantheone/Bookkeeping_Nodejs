@@ -457,7 +457,7 @@ exports.queryInitIncomeRecord = async function(ownerId) {
 exports.queryDepoMngAccBalanceParts = async function(depoId, mngAccId, initDateTime) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT transType, SUM(transAmount) as total FROM `bookkeeping` WHERE ((type = 'income' AND transType = 'init') OR (type = 'income' AND transType = 'income' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'expense' AND transDateTime >= $3)) AND (depo = $1 AND mngAcc = $2) GROUP BY transType;");
+    let queryStr = N1qlQuery.fromString("SELECT type, transType, SUM(transAmount) as total FROM `bookkeeping` WHERE ((type = 'income' AND transType = 'init') OR (type = 'income' AND transType = 'income' AND transDateTime >= $3) OR (type = 'income' AND transType = 'transfer' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'expense' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'transfer' AND transDateTime >= $3)) AND (depo = $1 AND mngAcc = $2) GROUP BY type, transType;");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
@@ -487,6 +487,48 @@ exports.deleteDocumentById = async function(documentId) {
           resolve(true);
         } else {
           console.error("Couldn't delete document: %j", err);
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+exports.insertUser = async function(user) {
+  return new Promise((resolve, reject) => {
+    bucket.insert(
+      user.id,
+      user,
+      (err, res) => {
+        if (!err) {
+          console.log("insert user %s successfully", user.id);
+          console.log(res);
+          resolve(true);
+        } else {
+          console.error("Couldn't insert user: %j", user.id);
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+exports.queryTransferRecords = async function(ownerId) {
+  return new Promise((resolve, reject) => {
+    let N1qlQuery = couchbase.N1qlQuery;
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND (type = 'income' OR type = 'expense') AND transType = 'transfer';");
+    queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+    bucket.query(
+      queryStr
+      , [ownerId]
+      , (err, res) => {
+        if (!err) {
+          res = res.map((entry) => { return entry.bookkeeping });
+          console.log("query transfer records of %s successfully", ownerId);
+          console.log(res);
+          resolve(res);
+        } else {
+          console.error("Couldn't query transfer records : %j", err);
           reject(err);
         }
       }

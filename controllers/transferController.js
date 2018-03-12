@@ -1,5 +1,5 @@
 var vldUtil = require("../utils/validation");
-var transferProc = require("../businessProcesses/incomeProcess");
+var transferProc = require("../businessProcesses/transferProcess");
 
 exports.getTransferableDepoMngAcc = async function(req, res) {
 

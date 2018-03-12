@@ -86,7 +86,8 @@ exports.isValidAmtFromSourceToTargetOfTheOwner = async function(ownerId, sourceD
       && availMngAccs.includes(targetMngAcc)
       && source.length == 1
       && source[0].currentBalance >= transAmount
-      && target.length == 1;
+      && target.length == 1
+      && transAmount > 0;
   } catch(err) {
     console.log(err + " <-- err happend; process layer consumes it and returns default value");
   }

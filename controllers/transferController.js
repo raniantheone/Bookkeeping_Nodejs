@@ -60,6 +60,17 @@ exports.transferAmount = async function(req, res) {
       , "owner ok"
       , "owner does not exist in system"
       , req.body.ownerId);
+    var duplicationGuard = vldUtil.createGuard(
+      (sourceDepoId, sourceMngAccId, targetDepoId, targetMngAccId) => {
+        return (sourceDepoId != targetDepoId) || (sourceMngAccId != targetMngAccId);
+      }
+      , "source is different from target"
+      , "source and target are the same"
+      , req.body.sourceDepo
+      , req.body.sourceMngAcc
+      , req.body.targetDepo
+      , req.body.targetMngAcc
+    );
     var amtSourceTargetInitGuard = vldUtil.createGuard(
       transferProc.isValidAmtFromSourceToTargetOfTheOwner
       , "Amount ok, source and target are initialized by the owner"
@@ -72,6 +83,7 @@ exports.transferAmount = async function(req, res) {
       , req.body.transAmount);
     var checkResult = await vldUtil.asyncGuardsCheck([
       ownerIdGuard
+      , duplicationGuard
       , amtSourceTargetInitGuard
     ]);
 

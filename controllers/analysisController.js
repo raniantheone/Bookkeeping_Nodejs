@@ -18,7 +18,7 @@ exports.getBalanceDistribution = async function(req, res) {
       analysisProc.ownerIdExists
       , "owner ok"
       , "owner does not exist in system"
-      , req.body.);
+      , req.body.ownerId);
     var checkResult = await vldUtil.asyncGuardsCheck([
       ownerIdGuard
     ]);

@@ -112,6 +112,7 @@ exports.queryAvailableDepos = async function(transIssuer) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
     let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE type = 'depo' AND (ownerId = $1 OR ARRAY_CONTAINS(editorIds, $1) );");
+    queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
       [transIssuer],
@@ -134,6 +135,7 @@ exports.queryAvailableMngAccs = async function(transIssuer) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
     let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE type = 'mngAcc' AND (ownerId = $1 OR ARRAY_CONTAINS(editorIds, $1) );");
+    queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
       [transIssuer],

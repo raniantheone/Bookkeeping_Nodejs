@@ -191,9 +191,9 @@ describe("#analysisProc", function() {
       });
       assert.equal(balanceEntryB.expenseSum, 1, "expense sum of balance B should match setup data");
       assert.equal(balanceEntryB.outboundTransferSum, 100, "balance B should have outbound transfer data of 100");
-      assert.equal(balanceEntryA.incomeSum, 10, "income sum of balance 10 should match setup data");
-      assert.equal(balanceEntryA.inboundTransferSum, 0, "balance A should not have inbound transfer data");
-      assert.equal(balanceEntryA.currentBalance, 409, "current balance A should be 409");
+      assert.equal(balanceEntryB.incomeSum, 10, "income sum of balance 10 should match setup data");
+      assert.equal(balanceEntryB.inboundTransferSum, 0, "balance B should not have inbound transfer data");
+      assert.equal(balanceEntryB.currentBalance, 409, "current balance B should be 409");
     });
 
     after(async function() {

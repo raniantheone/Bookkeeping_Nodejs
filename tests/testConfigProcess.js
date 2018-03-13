@@ -1,5 +1,5 @@
-var configProc = require("../businessProcesses/configProcess.js");
-
+// var configProc = require("../businessProcesses/configProcess.js");
+//
 // var p = configProc.ownerIdExists("trista167@gmail.com");
 //
 // var p = configProc.findCurrentDepoMngAccWithInitValue("trista167@gmail.com");

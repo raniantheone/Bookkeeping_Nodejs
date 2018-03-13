@@ -1,5 +1,5 @@
-var incomeProc = require("../businessProcesses/incomeProcess.js");
-
+// var incomeProc = require("../businessProcesses/incomeProcess.js");
+//
 // var p = incomeProc.ownerIdExists("trista167@gmail.com");
 //
 // var p = incomeProc.getInitDepoMngAccPrefAndMapping("trista167@gmail.com");

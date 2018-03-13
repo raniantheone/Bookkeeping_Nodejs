@@ -1,3 +1,11 @@
+/**
+ * This module provides format validation required by whole application
+ * , mostly used in controller layer.
+ * It also provide a general validation helper, please refer #asyncGuardsCheck.
+ * @module validation
+ */
+
+/** Create a promise which contains the validation logic */
 exports.createGuard = function(validationRule, successMsg, failMsg, ...valsToBeValidated) {
   let guard = {
     guardPromise: null,
@@ -28,11 +36,16 @@ exports.asyncGuardsCheck = async function(guards) {
   }).catch((err) => { console.log(err) });
 }
 
+/**
+* Examine if the input data is any of these: null, undefined, having length of 0
+* @param {string} inputStr any string
+* @returns {boolean} whether the input is null, undefined, or having length of 0
+*/
+exports.isEmpty = isEmpty;
 function isEmpty(inputStr) {
   console.log("isEmpty : " + inputStr);
   return inputStr === null || inputStr === undefined || inputStr.length === 0;
 }
-exports.isEmpty = isEmpty;
 
 exports.isNotEmpty = function(inputStr) {
   console.log("isNotEmpty : " + inputStr);

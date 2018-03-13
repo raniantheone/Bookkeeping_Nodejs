@@ -140,8 +140,7 @@ DepositoryInfoDeleted --> [*]
 
 ```viz
 digraph Context_Diagram{    
-        enti1input [label="Group of Bookkeepers" shape=box];          
-        enti1output [label="Group of Bookkeepers" shape=box];    
+        enti1 [label="Group of Bookkeepers" shape=box];          
         proc1 [label=<
           <table style="rounded" CELLBORDER="0" CELLSPACING="4">
             <tr>
@@ -154,13 +153,13 @@ digraph Context_Diagram{
           </table>
           >,
           shape=none];
-        splines=curve;
+
         rankdir="LR";
-        enti1input -> proc1 [ label = "Expense Record" ];
-        enti1input -> proc1 [ label = "Income Record" ];
-        enti1input -> proc1 [ label = "Transfer Record" ];
-        enti1input -> proc1 [ label = "Depository-Managing Account Configuration" ];
-        proc1 -> enti1output [ label = "Balance Distribution" ];
+        enti1 -> proc1 [ label = "Expense Record" ];
+        enti1 -> proc1 [ label = "Income Record" ];
+        enti1 -> proc1 [ label = "Transfer Record" ];
+        enti1 -> proc1 [ label = "Depository-Managing Account Configuration" ];
+        proc1 -> enti1 [ label = "Balance Distribution" ];
 }
 ```
 
@@ -169,13 +168,13 @@ digraph Context_Diagram{
 ```dot
 digraph Diagram_0{
 
-        splines=curve;
-        ratio=1;
+
+
+        ratio="compress"
         node [ fontsize=12 ];
         edge [ fontsize=10 ];
 
-        enti1input [label="Group of Bookkeepers" shape=box];          
-        enti1output [label="Group of Bookkeepers" shape=box];
+        enti1 [label="Group of Bookkeepers" shape=box];          
 
         subgraph cluster_system{
           proc1 [label=<
@@ -243,79 +242,83 @@ digraph Diagram_0{
             >,
             shape=none
           ];
-          datastore1[
-            shape="plain",
-            label=<
-              <table CELLBORDER="0" CELLPADDING="4">
-                <tr>
-                  <td></td>
-                  <vr/>
-                  <td>DS: Expense Record</td>
-                </tr>
-              </table>
-            >
-          ];
-          datastore2[
-            shape="plain",
-            label=<
-              <table CELLBORDER="0" CELLPADDING="4">
-                <tr>
-                  <td></td>
-                  <vr/>
-                  <td>DS: Income Record</td>
-                </tr>
-              </table>
-            >
-          ];
-          datastore3[
-            shape="plain",
-            label=<
-              <table CELLBORDER="0" CELLPADDING="4">
-                <tr>
-                  <td></td>
-                  <vr/>
-                  <td>DS: Depository Info</td>
-                </tr>
-              </table>
-            >
-          ];
-          datastore4[
-            shape="plain",
-            label=<
-              <table CELLBORDER="0" CELLPADDING="4">
-                <tr>
-                  <td></td>
-                  <vr/>
-                  <td>DS: Managing Account Info</td>
-                </tr>
-              </table>
-            >
-          ];
+
+          subgraph cluster_system{
+            datastore1[
+              shape="plain",
+              label=<
+                <table CELLBORDER="0" CELLPADDING="4">
+                  <tr>
+                    <td></td>
+                    <vr/>
+                    <td>DS: Expense Record</td>
+                  </tr>
+                </table>
+              >
+            ];
+            datastore2[
+              shape="plain",
+              label=<
+                <table CELLBORDER="0" CELLPADDING="4">
+                  <tr>
+                    <td></td>
+                    <vr/>
+                    <td>DS: Income Record</td>
+                  </tr>
+                </table>
+              >
+            ];
+            datastore3[
+              shape="plain",
+              label=<
+                <table CELLBORDER="0" CELLPADDING="4">
+                  <tr>
+                    <td></td>
+                    <vr/>
+                    <td>DS: Depository Info</td>
+                  </tr>
+                </table>
+              >
+            ];
+            datastore4[
+              shape="plain",
+              label=<
+                <table CELLBORDER="0" CELLPADDING="4">
+                  <tr>
+                    <td></td>
+                    <vr/>
+                    <td>DS: Managing Account Info</td>
+                  </tr>
+                </table>
+              >
+            ];
+          }
+
         }
 
-        enti1input -> proc1 [ label = "Expense Record" ];
-        datastore3 -> proc1 [ label = "Available Depositories" ];
-        datastore4 -> proc1 [ label = "Available Managing Accs" ];
+        enti1 -> proc1 [ label = "Expense Record" ];
+        datastore3 -> proc1 [ label = "Initialized Depo-MngAcc(s)" ];
+        datastore4 -> proc1 [ label = "Initialized Depo-MngAcc(s)" ];
         proc1 -> datastore1 [ label = "Expense Record" ];
-        enti1input -> proc2 [ label = "Income Record" ];
-        datastore3 -> proc2 [ label = "Available Depositories" ];
-        datastore4 -> proc2 [ label = "Available Managing Accs" ];
+        enti1 -> proc2 [ label = "Income Record" ];
+        datastore3 -> proc2 [ label = "Initialized Depo-MngAcc(s)" ];
+        datastore4 -> proc2 [ label = "Initialized Depo-MngAcc(s)" ];
         proc2 -> datastore2 [ label = "Income Record" ];
-        enti1input -> proc3 [ label = "Depository-Managing Account Configuration" ];
+        enti1 -> proc3 [ label = "Configuration Info" ];
         datastore3 -> proc3 [ label = "Available Depositories" ];
         datastore4 -> proc3 [ label = "Available Managing Accs" ];
         proc3 -> datastore3 [ label = "Depository Info" ];
         proc3 -> datastore4 [ label = "Managing Account Info" ];
         proc3 -> datastore2 [ label = "Depository-Managing Acc Init Record" ];
-        enti1input -> proc4 [ label = "Depository-Managing Acc Transfer Info" ];
-        datastore3 -> proc4 [ label = "Available Depositories" ];
-        datastore4 -> proc4 [ label = "Available Managing Accs" ];
+        enti1 -> proc4 [ label = "Transfer Record" ];
+        datastore3 -> proc4 [ label = "Initialized Depo-MngAcc(s)" ];
+        datastore4 -> proc4 [ label = "Initialized Depo-MngAcc(s)" ];
         proc4 -> datastore1 [ label = "Transfer Outbound Record" ];
         proc4 -> datastore2 [ label = "Transfer Inbound Record" ];
-        enti1input -> proc5 [ label = "Query Request" ];
+        enti1 -> proc5 [ label = "Query Request" ];
         datastore1 -> proc5 [ label = "Expense Records" ];
         datastore2 -> proc5 [ label = "Income Records" ];
-        proc5 -> enti1output [ label = "Balance Distribution" ];
+        proc5 -> enti1 [ label = "Balance Distribution" ];
 }
 ```
 
@@ -702,9 +705,7 @@ digraph digram_5{
       </tr>
       <HR/>
       <tr>
-        <td>Calculate Balance Distribution:
-        <br/>Depository by Managing Account
-        <br/>Managing Account By Despository</td>
+        <td>Calculate Depo-MngAcc-Balance</td>
       </tr>
     </table>
     >,

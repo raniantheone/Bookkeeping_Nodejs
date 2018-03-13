@@ -282,3 +282,16 @@
 //   });
 //
 // });
+
+/**
+Manually test the error handling behavior of transferFromSourceToTarget()
+Throw error at certain point and verify log
+**/
+// var transferProc = require("../businessProcesses/transferProcess");
+// var p = transferProc.transferFromSourceToTarget("trista167@gmail.com", "trista167@gmail.com::depo::1184541832", "trista167@gmail.com::mngAcc::3112233494", "trista167@gmail.com::depo::633596129", "trista167@gmail.com::mngAcc::3112233494", 1000);
+//
+// p.then((res) => {
+//   console.log(res);
+// }).catch((err) => {
+//   console.log(err);
+// })

@@ -119,9 +119,6 @@ exports.transferFromSourceToTarget = async function(ownerId, sourceDepoId, sourc
       , sourceMngAccId
     );
     outboundSuccess = await datastoreSvc.insertExpenseRecord(outboundTransferRecord);
-    if(!outboundSuccess) {
-      throw "failed to create outbound transfer record, abort transfer process now";
-    }
 
     inboundTransferRecord = incomeRecordFactory.buildIncomeRecord(
       ownerId
@@ -137,25 +134,21 @@ exports.transferFromSourceToTarget = async function(ownerId, sourceDepoId, sourc
       , targetMngAccId
     );
     inboundSuccess = await datastoreSvc.insertIncomeRecord(inboundTransferRecord);
-    if(!inboundSuccess) {
-      throw "failed to create inbound transfer record, abort transfer process now";
-    }
 
     transferSuccess = outboundSuccess && inboundSuccess;
 
   } catch(err) {
-    // TODO test this revert process
     try {
-      // delete outbound, inbound record if the whole process failed
-      if(outboundTransferRecord != null && !outboundSuccess) {
+      // delete outbound, inbound record if the whole process failed; tested manually
+      if(outboundSuccess) {
         await datastoreSvc.deleteDocumentById(outboundTransferRecord.id);
         console.log("err %s happened, revert transfer outbound record %s", err, outboundTransferRecord.id);
       }
-      if(inboundTransferRecord != null && !inboundSuccess) {
+      if(inboundSuccess) {
         await datastoreSvc.deleteDocumentById(inboundTransferRecord.id);
         console.log("err %s happened, revert transfer inbound record %s", err, inboundTransferRecord.id);
       }
-      if(outboundTransferRecord == null && inboundTransferRecord == null) {
+      if(!outboundSuccess && !inboundSuccess) {
         console.log("err %s happend, but neither outbound nor inbound record is created", err);
       }
     } catch(err) {

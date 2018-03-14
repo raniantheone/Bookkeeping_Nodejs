@@ -7,44 +7,43 @@ exports.getInitDepoMngAccAndPref = async function(ownerId) {
     availCombination: [],
     userPref: {}
   };
-  // combo schema
-  // {
-  //   depoId
-  //   depoDisplayName
-  //   mngAccId
-  //   mngAccDisplayName
-  // }
   try {
-    var entries = datastoreSvc.queryDepoMngAccWithInitValue(ownerId);
-  } catch(err) {
 
+    var queryResultArr = await Promise.all([
+      datastoreSvc.queryExistingUser(ownerId),
+      datastoreSvc.queryDepoMngAccWithInitValue(ownerId)
+    ]);
+
+    var user = queryResultArr[0];
+    initializedDepoMngAccAndUserPref.userPref = user.prefs || {};
+
+    var initAndMappingDataArr = queryResultArr[1];
+    var depoMap = {};
+    var mngAccMap = {};
+    for(let entry of initAndMappingDataArr) {
+      if(entry.type == "depo") {
+        depoMap[ entry.id ] = entry.displayName;
+      }else if(entry.type == "mngAcc") {
+        mngAccMap[ entry.id ] = entry.displayName;
+      }else if(entry.type == "income" && entry.transType == "init") {
+        var combo = {
+          depoId: entry.depo,
+          depoDisplayName: null,
+          mngAccId: entry.mngAcc,
+          mngAccDisplayName: null
+        };
+        initializedDepoMngAccAndUserPref.availCombination.push(combo);
+      }
+    }
+    initializedDepoMngAccAndUserPref.availCombination.forEach((combo) => {
+      combo.depoDisplayName = depoMap[combo.depoId];
+      combo.mngAccDisplayName = mngAccMap[combo.mngAccId];
+    });
+
+  } catch(err) {
+    console.log(err + " <-- err happend; process layer - getInitDepoMngAccAndPref consumes it and returns default value");
   }
   return initializedDepoMngAccAndUserPref;
-  //
-  //
-  // return new Promise((resolve, reject) => {
-  //   datastoreSvc.queryDepoMngAccAndPreselect(ownerId).then((dbData) => {
-  //     let groupedData = {
-  //       depos: [],
-  //       mngAccs: [],
-  //       userPref: {}
-  //     };
-  //     dbData.forEach(function(entry) {
-  //       let type = entry.bookkeeping.type;
-  //       if(type == "depo") {
-  //         groupedData.depos.push(entry.bookkeeping);
-  //       } else if(type == "mngAcc") {
-  //         groupedData.mngAccs.push(entry.bookkeeping);
-  //       } else if(type == "user") {
-  //         groupedData.userPref = entry.bookkeeping;
-  //       }
-  //     });
-  //     resolve(groupedData);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
-  // });
 }
 
 exports.saveExpenseRecord = async function(clientExpenseRecord) {

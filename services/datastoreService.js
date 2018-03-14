@@ -41,19 +41,20 @@ exports.saveUserPrefs = async function(ownerId, prefs) {
 
     let N1qlQuery = couchbase.N1qlQuery;
     let queryStr = N1qlQuery.fromString("SELECT prefs FROM `bookkeeping` WHERE META().id = $1");
+    queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     let userPref = await new Promise((resolve, reject) => {
       bucket.query(
         queryStr,
         [ownerId + "::user"],
         (err, res) => {
           if (!err) {
-            console.log("Query user pref successfully. Pref is");
-            console.log(res);
             res = res.length == 0 ?
               {}
               : res[0].prefs ?
                 res[0].prefs
                 : {};
+            console.log("Query user pref successfully. Pref is");
+            console.log(res);
             resolve(res);
           } else {
             console.error("Couldn't query user pref: %j", err);
@@ -67,13 +68,15 @@ exports.saveUserPrefs = async function(ownerId, prefs) {
         userPref[key] = pref[key];
     })
 
-    let updateStr = N1qlQuery.fromString("UPDATE `bookkeeping` SET prefs = $2 WHERE META().id = $1");
+    let updateStr = N1qlQuery.fromString("UPDATE `bookkeeping` SET prefs = $2 WHERE META().id = $1 RETURNING *;");
+    updateStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     let updateResult = await new Promise((resolve, reject) => {
       bucket.query(
         updateStr,
         [ownerId + "::user", userPref],
         (err, res) => {
           if (!err) {
+            console.log(res);
             console.log("Updated document successfully. Update content is");
             console.log(userPref);
             resolve(true);

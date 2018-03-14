@@ -4,7 +4,7 @@ var incomeController = require("../controllers/incomeController");
 var transferController = require("../controllers/transferController");
 var router = express.Router();
 
-// Serve initial page form setup data for "keep expense record" page
+// Serve initialized depo-mngAcc combinations and user preference of them
 router.post("/expense/initData", expenseController.getAvailDepoMngAccOptForExpense);
 
 // Keep expense record

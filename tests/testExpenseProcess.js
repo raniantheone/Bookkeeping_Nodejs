@@ -8,7 +8,6 @@ var mngAccFactory = require("../businessProcesses/models/managingAccount");
 var userFactory = require("../businessProcesses/models/user");
 var expenseProc = require("../businessProcesses/expenseProcess.js");
 
-
 describe("Test expenseProcess", function() {
 
   var testUserId;
@@ -31,10 +30,12 @@ describe("Test expenseProcess", function() {
 
     var initDepoA = depoFactory.buildDepository("somebody@test.org", "test depo A", [], []);
     initDepoIdA = initDepoA.id;
+    initDepoNameA = initDepoA.displayName;
     await datastoreSvc.createDepo(initDepoA);
 
     var initMngAccA = mngAccFactory.buildManagingAccount("somebody@test.org", "test mngAcc A", [], []);
     initMngAccIdA = initMngAccA.id;
+    initMngAccNameA = initMngAccA.displayName;
     await datastoreSvc.createMngAcc(initMngAccA);
 
     var initIncomeRecordA = incomeRecordFactory.buildIncomeRecord(
@@ -55,10 +56,12 @@ describe("Test expenseProcess", function() {
 
     var initDepoB = depoFactory.buildDepository("somebody@test.org", "test depo B", [], []);
     initDepoIdB = initDepoB.id;
+    initDepoNameB = initDepoB.displayName;
     await datastoreSvc.createDepo(initDepoB);
 
     var initMngAccB = mngAccFactory.buildManagingAccount("somebody@test.org", "test mngAcc B", [], []);
     initMngAccIdB = initMngAccB.id;
+    initMngAccNameB = initMngAccB.displayName;
     await datastoreSvc.createMngAcc(initMngAccB);
 
     var initIncomeRecordB = incomeRecordFactory.buildIncomeRecord(
@@ -81,7 +84,7 @@ describe("Test expenseProcess", function() {
 
   describe("#getInitDepoMngAccAndPref", function() {
 
-    it("Should return initialized depo-mngAcc combinations with displayName, as well as user preference", async function() {
+    it("Should return initialized depo-mngAcc combinations with displayName, and user preference should be an empty object", async function() {
 
       var result = await expenseProc.getInitDepoMngAccAndPref("somebody@test.org");
       assert.equal(result.availCombination.length, 2, "There should be 2 initialized entries.");
@@ -104,9 +107,28 @@ describe("Test expenseProcess", function() {
       assert.equal(testCombinationB.depoDisplayName, initDepoNameB, "Depo display name of test combo B should match test data");
       assert.equal(testCombinationB.mngAccDisplayName, initMngAccNameB, "MngAcc display name of test combo B should match test data");
 
-      assert.equal(result.userPref.preferredExpenseDepo, initDepoIdA, "Tester's preferred expense depoId should be that of depo B.");
-      assert.equal(result.userPref.preferredExpenseMngAcc, initMngAccIdA, "Tester's preferred expense mngAccId should be that of depo B.");
+      assert.equal(Object.keys(result.userPref).length, 0, "Tester should not have any preference now.");
 
+    });
+
+    describe("Now user have expense preference for depo A and mngAcc A", function() {
+      before(async function() {
+
+        await datastoreSvc.saveUserPrefs("somebody@test.org", [
+          {preferredExpenseDepo: initDepoIdA},
+          {preferredExpenseMngAcc: initMngAccIdA}
+        ]);
+
+      });
+
+      it("Should return user preference content", async function() {
+
+        var result = await expenseProc.getInitDepoMngAccAndPref("somebody@test.org");
+        assert.equal(result.userPref.preferredExpenseDepo, initDepoIdA, "Tester's preferred expense depoId should be that of depo A.");
+        assert.equal(result.userPref.preferredExpenseMngAcc, initMngAccIdA, "Tester's preferred expense mngAccId should be that of depo A.");
+        console.log(result);
+
+      });
     });
 
   });

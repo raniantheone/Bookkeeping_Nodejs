@@ -1,9 +1,9 @@
 var expenssProc = require("../businessProcesses/expenseProcess");
 var vldUtil = require("../utils/validation");
 
-exports.getDynamicInitData = async function(req, res) {
+exports.getAvailDepoMngAccOptForExpense = async function(req, res) {
 
-  console.log("getDynamicInitData invoked");
+  console.log("getAvailDepoMngAccOptForExpense invoked");
   console.log(req.body);
 
   var respContent = {  // TODO try to make it a module, error as well
@@ -13,7 +13,7 @@ exports.getDynamicInitData = async function(req, res) {
   };
   try {
     if(vldUtil.isNotEmpty(req.body.ownerId)) {
-      respContent.payload = await expenssProc.getDepoMngAccAndPreselect(req.body.ownerId);
+      respContent.payload = await expenssProc.getInitDepoMngAccAndPref(req.body.ownerId);
     }
   } catch(err) {
     console.log(err);

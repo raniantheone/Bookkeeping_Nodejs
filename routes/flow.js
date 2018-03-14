@@ -5,7 +5,7 @@ var transferController = require("../controllers/transferController");
 var router = express.Router();
 
 // Serve initial page form setup data for "keep expense record" page
-router.post("/expense/initData", expenseController.getDynamicInitData);
+router.post("/expense/initData", expenseController.getAvailDepoMngAccOptForExpense);
 
 // Keep expense record
 router.post("/expense/keepRecord", expenseController.keepExpenseRecord);

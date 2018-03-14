@@ -2,30 +2,49 @@ var datastoreSvc = require("../services/datastoreService");
 var valUtil = require("../utils/validation");
 var expenseRecordFactory = require("./models/expenseRecord");
 
-exports.getDepoMngAccAndPreselect = async function(ownerId) {
-  return new Promise((resolve, reject) => {
-    datastoreSvc.queryDepoMngAccAndPreselect(ownerId).then((dbData) => {
-      let groupedData = {
-        depos: [],
-        mngAccs: [],
-        userPref: {}
-      };
-      dbData.forEach(function(entry) {
-        let type = entry.bookkeeping.type;
-        if(type == "depo") {
-          groupedData.depos.push(entry.bookkeeping);
-        } else if(type == "mngAcc") {
-          groupedData.mngAccs.push(entry.bookkeeping);
-        } else if(type == "user") {
-          groupedData.userPref = entry.bookkeeping;
-        }
-      });
-      resolve(groupedData);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  });
+exports.getInitDepoMngAccAndPref = async function(ownerId) {
+  var initializedDepoMngAccAndUserPref = {
+    availCombination: [],
+    userPref: {}
+  };
+  // combo schema
+  // {
+  //   depoId
+  //   depoDisplayName
+  //   mngAccId
+  //   mngAccDisplayName
+  // }
+  try {
+    var entries = datastoreSvc.queryDepoMngAccWithInitValue(ownerId);
+  } catch(err) {
+
+  }
+  return initializedDepoMngAccAndUserPref;
+  //
+  //
+  // return new Promise((resolve, reject) => {
+  //   datastoreSvc.queryDepoMngAccAndPreselect(ownerId).then((dbData) => {
+  //     let groupedData = {
+  //       depos: [],
+  //       mngAccs: [],
+  //       userPref: {}
+  //     };
+  //     dbData.forEach(function(entry) {
+  //       let type = entry.bookkeeping.type;
+  //       if(type == "depo") {
+  //         groupedData.depos.push(entry.bookkeeping);
+  //       } else if(type == "mngAcc") {
+  //         groupedData.mngAccs.push(entry.bookkeeping);
+  //       } else if(type == "user") {
+  //         groupedData.userPref = entry.bookkeeping;
+  //       }
+  //     });
+  //     resolve(groupedData);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
+  // });
 }
 
 exports.saveExpenseRecord = async function(clientExpenseRecord) {

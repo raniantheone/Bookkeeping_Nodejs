@@ -393,8 +393,8 @@ digraph digram_1{
 
   { rank=source; enti1input;}
   enti1input -> proc1_1 [ label="Unvalidated Expnese Info" ];
-  dsDepositoryInfo -> proc1_1 [ label="Available Depository" ];
-  dsManagingAccountInfo -> proc1_1 [ label="Available Managing Account" ];
+  dsDepositoryInfo -> proc1_1 [ label="Initialized Depo-MngAcc(s)" ];
+  dsManagingAccountInfo -> proc1_1 [ label="Initialized Depo-MngAcc(s)" ];
   proc1_1 -> proc1_2 [ label="Valid Expnese Record" ];
   proc1_2 -> dsExpenseRecord [ label="Valid Expnese Record" ];
 }

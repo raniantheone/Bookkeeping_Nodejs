@@ -81,30 +81,31 @@ exports.saveExpenseRecord = async function(itemName, itemDesc, transAmount, tran
   var insertSuccess = false;
   try {
 
-  } catch(err) {
+    var matchedDepo = await datastoreSvc.queryDepoById(depoId);
+    var ownerId = matchedDepo != null ? matchedDepo.ownerId : "";
+    if(ownerId.length == 0) {
+      return insertSuccess;
+    };
 
+    var expenseRecord = expenseRecordFactory.buildExpenseRecord(
+      ownerId
+      , []
+      , []
+      , itemName
+      , itemDesc
+      , transAmount
+      , new Date(transDateTime)
+      , transType
+      , transIssuer
+      , depoId
+      , mngAccId
+    );
+    insertSuccess = await datastoreSvc.insertExpenseRecord(expenseRecord);
+
+  } catch(err) {
+    console.log(err + " <-- err happend; process layer - saveExpenseRecord consumes it and returns default value");
   }
   return insertSuccess;
-
-  // var recordOwnerId = clientExpenseRecord.depo.split("::")[0];
-  //
-  // return new Promise((resolve, reject) => {
-  //   var expenseRecord = expenseRecordFactory.buildExpenseRecord(
-  //     recordOwnerId,
-  //     [],
-  //     [],
-  //     clientExpenseRecord.itemName,
-  //     clientExpenseRecord.itemDesc,
-  //     clientExpenseRecord.transAmount,
-  //     new Date(clientExpenseRecord.transDateTime),
-  //     clientExpenseRecord.transType,
-  //     clientExpenseRecord.transIssuer,
-  //     clientExpenseRecord.depo,
-  //     clientExpenseRecord.mngAcc
-  //   );
-  //   console.log(expenseRecord);
-  //   resolve(datastoreSvc.insertExpenseRecord(expenseRecord));
-  // });
 }
 
 exports.asyncKeepFreqExpenseDepoMngAccPref = async function(ownerId, preferredDepo, preferredMngAcc) {

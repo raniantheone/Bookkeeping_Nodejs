@@ -60,38 +60,20 @@ exports.keepExpenseRecord = async function(req, res) {
     , "issuer does not exist in system"
     , req.body.transIssuer);
   var depoMngAccInitializedGuard = vldUtil.createGuard(
-    expenssProc.comboIsInitializedAndAvailable // TODO
-    , "depo or mngAcc is not initialized, or the issuer do not have permission to use any"
+    expenssProc.comboIsInitializedAndAvailable
     , "depo and mngAcc combination is fine"
-    , req.body.transIssuer,
-    , req.body.depo,
+    , "depo or mngAcc is not initialized, or the issuer do not have permission to use any"
+    , req.body.transIssuer
+    , req.body.depo
     , req.body.mngAcc
   );
-
-
-  // var depoGuard = vldUtil.createGuard(
-  //   expenssProc.isValidDepo
-  //   , "depo ok"
-  //   , "depo is not within valid depo set"
-  //   , req.body.transIssuer
-  //   , req.body.depo);
-  // var mngAccGuard = vldUtil.createGuard(
-  //   expenssProc.isValidMngAcc
-  //   , "mngAcc ok"
-  //   , "mngAcc is not within valid mngAcc set"
-  //   , req.body.transIssuer
-  //   , req.body.mngAcc);
-
-
-
   var checkResult = await vldUtil.asyncGuardsCheck([
     itemNameGuard,
-    transAmountGuard,
-    transDateTimeGuard,
-    transTypeGuard,
-    transIssuerGuard,
-    depoGuard,
-    mngAccGuard
+    , transAmountGuard
+    , transDateTimeGuard
+    , transTypeGuard
+    , transIssuerGuard
+    , depoMngAccInitializedGuard
   ]);
 
   var respContent = {  // TODO try to make it a module, error as well

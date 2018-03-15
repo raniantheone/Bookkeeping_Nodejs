@@ -172,8 +172,9 @@ describe("Test expenseProcess", function() {
 
     after(async function() {
       let testDocIdsToBeCleared = [
-        testDepoC
-        , testMngAccC
+        testDepoIdC
+        , testMngAccIdC
+        , irrelevantUserId
       ];
       for(let docId of testDocIdsToBeCleared) {
         await datastoreSvc.deleteDocumentById(docId);

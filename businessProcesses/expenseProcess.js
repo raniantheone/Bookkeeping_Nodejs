@@ -130,8 +130,32 @@ exports.comboIsInitializedAndAvailable = async function(transIssuer, depoId, mng
   var isInitializedAndAvailable = false;
   try {
 
-  } catch() {
+    var matchedDepo = await datastoreSvc.queryDepoById(depoId);
+    var ownerId = matchedDepo != null ? matchedDepo.ownerId : "";
+    if(ownerId.length == 0) {
+      return isInitializedAndAvailable;
+    };
 
+    var entries = await datastoreSvc.queryDepoMngAccWithInitValue(ownerId);
+    var isInitialized = false;
+    var isAvailableDepo = false;
+    var isAvailableMngAcc = false;
+    entries.forEach((entry) => {
+      if(entry.type == "income" && entry.transType == "init" && entry.depo == depoId && entry.mngAcc == mngAccId) {
+        isInitialized = true;
+      }else if(entry.ownerId == transIssuer || entry.editorIds.includes(transIssuer)) {
+        if(entry.type == "depo" && entry.id == depoId) {
+          isAvailableDepo = true;
+        }else if(entry.type == "mngAcc" && entry.id == mngAccId) {
+          isAvailableMngAcc = true;
+        }
+      }
+    });
+    isInitializedAndAvailable = isInitialized && isAvailableDepo && isAvailableMngAcc;
+    console.log("isInitialized: %s, isAvailableDepo %s, isAvailableMngAcc: %s", isInitialized, isAvailableDepo, isAvailableMngAcc);
+
+  } catch(err) {
+    console.log(err + " <-- err happend; process layer - comboIsInitializedAndAvailable consumes it and returns default value");
   }
   return isInitializedAndAvailable;
 }

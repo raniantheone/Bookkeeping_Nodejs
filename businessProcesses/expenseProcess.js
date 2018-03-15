@@ -1,7 +1,38 @@
+/**
+ * This module contains business logic for expense flow.
+ * @module expenseProcess
+ */
+
 var datastoreSvc = require("../services/datastoreService");
 var valUtil = require("../utils/validation");
 var expenseRecordFactory = require("./models/expenseRecord");
 
+/**
+ * @typedef {Object} Combo
+ * @property {string} depoId Unique depository id.
+ * @property {string} depoDisplayName Specified by user and can be displayed directly. Not unique.
+ * @property {string} mngAccId Unique managing account id.
+ * @property {string} mngAccDisplayName Specified by user and can be displayed directly. Not unique.
+ */
+
+/**
+ * @typedef {Object} UserPref
+ * @property {string} arbitraryKV any key-value pair(s) representing user preference detail. For expense related preference, the key range is [preferredExpenseDepo, preferredExpenseMngAcc].
+ */
+
+/**
+ * @typedef {Object} InitializedDepoMngAccAndUserPref
+ * @property {Combo[]} availCombination Initialized combinations of depsoitory - managing account; will be an empty array if no record was found.
+ * @property {UserPref} userPref User preference(s) presented as key - value in this object; will be an empty object if no preference exists.
+ */
+
+/**
+ * Given an existing owner, get his/her initialized depository - managing account combinations
+ * , as well as his/her depository or managing account preference if any.
+ * <br>\*Expense records can only be issued under initialized combinations.
+ * @param {string} ownerId The owner of depository - managing account combinations.
+ * @returns {InitializedDepoMngAccAndUserPref} An object which contains available initialized combinations and preference of the user.
+ */
 exports.getInitDepoMngAccAndPref = async function(ownerId) {
   var initializedDepoMngAccAndUserPref = {
     availCombination: [],
@@ -126,6 +157,15 @@ exports.isValidMngAcc = async function(transIssuer, mngAccId) {
   return valUtil.isWithinValSet(mngAccId, availableMngAccsIds);
 }
 
+/**
+ * Check if the depository - managing account is initialized
+ * , and if the expense issuer can use the depository and managing account.
+ * <br>\*Expense records can only be issued under initialized combinations.
+ * @param {string} transIssuer The ownerId of <b>expense issuer</b>.
+ * @param {string} depoId The id of depository.
+ * @param {string} mngAccId The id of managing account.
+ * @returns {boolean} Only true if the depository - managing account is initialized and if the expense issuer can use it.
+ */
 exports.comboIsInitializedAndAvailable = async function(transIssuer, depoId, mngAccId) {
   var isInitializedAndAvailable = false;
   try {

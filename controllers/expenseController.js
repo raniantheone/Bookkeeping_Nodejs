@@ -1,3 +1,8 @@
+/**
+ * This module handles request regarding expense flow.
+ * @module expenseController
+ */
+
 var expenssProc = require("../businessProcesses/expenseProcess");
 var vldUtil = require("../utils/validation");
 
@@ -37,7 +42,7 @@ exports.keepExpenseRecord = async function(req, res) {
   var transAmountGuard = vldUtil.createGuard(
     vldUtil.isNumGreaterThanZero
     , "transAmount ok"
-    , "transAmount is smaller than 1"
+    , "transAmount have to be greater than 0"
     , req.body.transAmount);
   var transDateTimeGuard = vldUtil.createGuard(
     vldUtil.isDate
@@ -54,18 +59,31 @@ exports.keepExpenseRecord = async function(req, res) {
     , "issuer ok"
     , "issuer does not exist in system"
     , req.body.transIssuer);
-  var depoGuard = vldUtil.createGuard(
-    expenssProc.isValidDepo
-    , "depo ok"
-    , "depo is not within valid depo set"
-    , req.body.transIssuer
-    , req.body.depo);
-  var mngAccGuard = vldUtil.createGuard(
-    expenssProc.isValidMngAcc
-    , "mngAcc ok"
-    , "mngAcc is not within valid mngAcc set"
-    , req.body.transIssuer
-    , req.body.mngAcc);
+  var depoMngAccInitializedGuard = vldUtil.createGuard(
+    expenssProc.comboIsInitializedAndAvailable // TODO
+    , "depo or mngAcc is not initialized, or the issuer do not have permission to use any"
+    , "depo and mngAcc combination is fine"
+    , req.body.transIssuer,
+    , req.body.depo,
+    , req.body.mngAcc
+  );
+
+
+  // var depoGuard = vldUtil.createGuard(
+  //   expenssProc.isValidDepo
+  //   , "depo ok"
+  //   , "depo is not within valid depo set"
+  //   , req.body.transIssuer
+  //   , req.body.depo);
+  // var mngAccGuard = vldUtil.createGuard(
+  //   expenssProc.isValidMngAcc
+  //   , "mngAcc ok"
+  //   , "mngAcc is not within valid mngAcc set"
+  //   , req.body.transIssuer
+  //   , req.body.mngAcc);
+
+
+
   var checkResult = await vldUtil.asyncGuardsCheck([
     itemNameGuard,
     transAmountGuard,

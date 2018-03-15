@@ -125,3 +125,13 @@ exports.isValidMngAcc = async function(transIssuer, mngAccId) {
   });
   return valUtil.isWithinValSet(mngAccId, availableMngAccsIds);
 }
+
+exports.comboIsInitializedAndAvailable = async function(transIssuer, depoId, mngAccId) {
+  var isInitializedAndAvailable = false;
+  try {
+
+  } catch() {
+
+  }
+  return isInitializedAndAvailable;
+}

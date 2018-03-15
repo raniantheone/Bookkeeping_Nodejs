@@ -133,6 +133,55 @@ describe("Test expenseProcess", function() {
 
   });
 
+  describe("#comboIsInitializedAndAvailable", function() {
+
+    // scenario: depo and mngAcc C is not initialized
+
+    var testDepoIdC;
+    var testMngAccIdC;
+    var irrelevantUserId;
+
+    before(async function() {
+      var testDepoC = depoFactory.buildDepository("somebody@test.org", "test depo C", [], []);
+      testDepoIdC = testDepoC.id;
+      await datastoreSvc.createDepo(testDepoC);
+
+      var testMngAccC = mngAccFactory.buildManagingAccount("somebody@test.org", "test mngAcc C", [], []);
+      testMngAccIdC = testMngAccC.id;
+      await datastoreSvc.createMngAcc(testMngAccC);
+
+      var irrelevantUser = userFactory.buildUser("nobody@test.org", "password", "email", "nobody", new Date());
+      irrelevantUserId = irrelevantUser.id;
+      await datastoreSvc.insertUser(irrelevantUser);
+    });
+
+    it("Should not pass check when depo-mngAcc combo is not initialized", async function() {
+      var res = await expenseProc.comboIsInitializedAndAvailable("somebody@test.org", testDepoIdC, testMngAccIdC);
+      assert.equal(res, false);
+    });
+
+    it("Should not pass check when initialized depo-mngAcc is not available to the issuer", async function() {
+      var res = await expenseProc.comboIsInitializedAndAvailable("nobody@test.org", initDepoIdA, initMngAccIdA);
+      assert.equal(res, false);
+    });
+
+    it("Should pass when initialized depo-mngAcc is available to the issuer", async function() {
+      var res = await expenseProc.comboIsInitializedAndAvailable("somebody@test.org", initDepoIdA, initMngAccIdA);
+      assert.equal(res, true);
+    });
+
+    after(async function() {
+      let testDocIdsToBeCleared = [
+        testDepoC
+        , testMngAccC
+      ];
+      for(let docId of testDocIdsToBeCleared) {
+        await datastoreSvc.deleteDocumentById(docId);
+      }
+    });
+
+  });
+
   after(async function() {
 
     var testDocIdsToBeCleared = [

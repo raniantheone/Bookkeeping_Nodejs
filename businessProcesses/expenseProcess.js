@@ -77,6 +77,18 @@ exports.getInitDepoMngAccAndPref = async function(ownerId) {
   return initializedDepoMngAccAndUserPref;
 }
 
+/**
+ * Keep an expense record.
+ * @param {string} itemName Name of expense item.
+ * @param {string} itemDesc Optional description.
+ * @param {number} transAmount How much is spent.
+ * @param {string} transDateTime Date string; iso format expected.
+ * @param {string} transType "expense"
+ * @param {string} transIssuer The person who issued this expense transaction.
+ * @param {string} depoId Id of the depository.
+ * @param {string} mngAccId Managing account of the depository.
+ * @returns {boolean} True if the record is successfully kept.
+ */
 exports.saveExpenseRecord = async function(itemName, itemDesc, transAmount, transDateTime, transType, transIssuer, depoId, mngAccId) {
   var insertSuccess = false;
   try {

@@ -84,7 +84,16 @@ exports.keepExpenseRecord = async function(req, res) {
   try {
     // save record
     if(checkResult.allValidated) {
-      respContent.payload = await expenssProc.saveExpenseRecord(req.body);
+      respContent.payload = await expenssProc.saveExpenseRecord(
+        req.body.itemName
+        , req.body.itemDesc
+        , req.body.transAmount
+        , req.body.transDateTime
+        , req.body.transType
+        , req.body.transIssuer
+        , req.body.depo
+        , req.body.mngAcc
+      );
     } else {
       respContent.payload = checkResult.allGuards.filter(function(guard) {
         return !guard.isValid;

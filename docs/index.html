@@ -59,36 +59,6 @@
               
                 
                 <li><a
-                  href='#combo'
-                  class="">
-                  Combo
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#userpref'
-                  class="">
-                  UserPref
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#initializeddepomngaccanduserpref'
-                  class="">
-                  InitializedDepoMngAccAndUserPref
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#validation'
                   class=" toggle-sibling">
                   validation
@@ -189,7 +159,7 @@
 <br>*Expense records can only be issued under initialized combinations.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getInitDepoMngAccAndPref(ownerId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="#initializeddepomngaccanduserpref">InitializedDepoMngAccAndUserPref</a></div>
+  <div class='pre p1 fill-light mt0'>getInitDepoMngAccAndPref(ownerId: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): {x: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>, y: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>}</div>
   
   
 
@@ -221,7 +191,7 @@
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="#initializeddepomngaccanduserpref">InitializedDepoMngAccAndUserPref</a></code>:
+      <code>{x: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>, y: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>}</code>:
         An object which contains available initialized combinations and preference of the user.
 
       
@@ -335,227 +305,6 @@ expense issuer
     </div>
   
 </div>
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='combo'>
-      Combo
-    </h3>
-    
-    
-  </div>
-  
-
-  
-
-  <div class='pre p1 fill-light mt0'>Combo</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>depoId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Unique depository id.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>depoDisplayName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Specified by user and can be displayed directly. Not unique.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>mngAccId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Unique managing account id.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>mngAccDisplayName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Specified by user and can be displayed directly. Not unique.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='userpref'>
-      UserPref
-    </h3>
-    
-    
-  </div>
-  
-
-  
-
-  <div class='pre p1 fill-light mt0'>UserPref</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>arbitraryKV</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : any key-value pair(s) representing user preference detail. For expense related preference, the key range is 
-[
-preferredExpenseDepo, preferredExpenseMngAcc
-]
-.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='initializeddepomngaccanduserpref'>
-      InitializedDepoMngAccAndUserPref
-    </h3>
-    
-    
-  </div>
-  
-
-  
-
-  <div class='pre p1 fill-light mt0'>InitializedDepoMngAccAndUserPref</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>availCombination</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#combo">Combo</a>>)</code>
-          : Initialized combinations of depsoitory - managing account; will be an empty array if no record was found.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>userPref</span> <code class='quiet'>(<a href="#userpref">UserPref</a>)</code>
-          : User preference(s) presented as key - value in this object; will be an empty object if no preference exists.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
 
   
 

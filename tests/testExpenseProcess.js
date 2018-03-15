@@ -183,6 +183,43 @@ describe("Test expenseProcess", function() {
 
   });
 
+  describe("#saveExpenseRecord", function() {
+
+    var testExpenseRecordId;
+
+    it("Should have newly kept expense record in query result", async function() {
+
+      var operRes = await expenseProc.saveExpenseRecord(
+        "test keeping expense record"
+        , "nothing special"
+        , 10
+        , new Date().toISOString()
+        , "expense"
+        , "somebody@test.org"
+        , initDepoIdA
+        , initMngAccIdA
+      );
+      assert.equal(operRes, true, "operation should be successful with all correct input");
+
+      var somebodysFlowRecords = await datastoreSvc.queryFlowRecordByOwnerId("somebody@test.org");
+      var newlyKeptExpenseRecord = somebodysFlowRecords.filter((record) => {
+        return record.depo == initDepoIdA && record.mngAcc == initMngAccIdA && record.type == "expense" && record.itemName == "test keeping expense record";
+      }).reduce((defaultVal, matched) => {
+        return matched ? matched : defaultVal;
+      }, null);
+      assert.isNotNull(newlyKeptExpenseRecord, "there should be one newly kept expense record");
+
+      testExpenseRecordId = newlyKeptExpenseRecord != null ? newlyKeptExpenseRecord.id : null;
+    });
+
+    after(async function() {
+      if(testExpenseRecordId != null) {
+        await datastoreSvc.deleteDocumentById(testExpenseRecordId);
+      }
+    })
+
+  });
+
   after(async function() {
 
     var testDocIdsToBeCleared = [

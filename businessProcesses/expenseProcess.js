@@ -77,27 +77,34 @@ exports.getInitDepoMngAccAndPref = async function(ownerId) {
   return initializedDepoMngAccAndUserPref;
 }
 
-exports.saveExpenseRecord = async function(clientExpenseRecord) {
+exports.saveExpenseRecord = async function(itemName, itemDesc, transAmount, transDateTime, transType, transIssuer, depoId, mngAccId) {
+  var insertSuccess = false;
+  try {
 
-  var recordOwnerId = clientExpenseRecord.depo.split("::")[0];
+  } catch(err) {
 
-  return new Promise((resolve, reject) => {
-    var expenseRecord = expenseRecordFactory.buildExpenseRecord(
-      recordOwnerId,
-      [],
-      [],
-      clientExpenseRecord.itemName,
-      clientExpenseRecord.itemDesc,
-      clientExpenseRecord.transAmount,
-      new Date(clientExpenseRecord.transDateTime),
-      clientExpenseRecord.transType,
-      clientExpenseRecord.transIssuer,
-      clientExpenseRecord.depo,
-      clientExpenseRecord.mngAcc
-    );
-    console.log(expenseRecord);
-    resolve(datastoreSvc.insertExpenseRecord(expenseRecord));
-  });
+  }
+  return insertSuccess;
+
+  // var recordOwnerId = clientExpenseRecord.depo.split("::")[0];
+  //
+  // return new Promise((resolve, reject) => {
+  //   var expenseRecord = expenseRecordFactory.buildExpenseRecord(
+  //     recordOwnerId,
+  //     [],
+  //     [],
+  //     clientExpenseRecord.itemName,
+  //     clientExpenseRecord.itemDesc,
+  //     clientExpenseRecord.transAmount,
+  //     new Date(clientExpenseRecord.transDateTime),
+  //     clientExpenseRecord.transType,
+  //     clientExpenseRecord.transIssuer,
+  //     clientExpenseRecord.depo,
+  //     clientExpenseRecord.mngAcc
+  //   );
+  //   console.log(expenseRecord);
+  //   resolve(datastoreSvc.insertExpenseRecord(expenseRecord));
+  // });
 }
 
 exports.asyncKeepFreqExpenseDepoMngAccPref = async function(ownerId, preferredDepo, preferredMngAcc) {

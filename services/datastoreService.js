@@ -540,3 +540,26 @@ exports.queryTransferRecords = async function(ownerId) {
     );
   });
 }
+
+exports.queryFlowRecordByOwnerId = async function(ownerId) {
+  return new Promise((resolve, reject) => {
+    let N1qlQuery = couchbase.N1qlQuery;
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND (type = 'income' OR type = 'expense');");
+    queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+    bucket.query(
+      queryStr
+      , [ownerId]
+      , (err, res) => {
+        if (!err) {
+          res = res.map((entry) => { return entry.bookkeeping });
+          console.log("query flow records of %s successfully", ownerId);
+          console.log(res);
+          resolve(res);
+        } else {
+          console.error("Couldn't query flow records : %j", err);
+          reject(err);
+        }
+      }
+    );
+  });
+}

@@ -13,29 +13,35 @@
   </p>
   <p>
     <label>Date</label>
-    <input class="w3-input w3-light-grey w3-xlarge" type="date">
+    <input class="w3-input w3-light-grey w3-xlarge" type="date" id="transDateTime">
   </p>
   <p>
     <label>Depository</label>
-    <select class="w3-select w3-light-grey w3-xlarge" name="option">
-      <option value="1">Option 1</option>
-      <option value="2">Option 2</option>
-      <option value="3">Option 3</option>
-    </select>
-    <span class="w3-tag w3-green w3-round-small">
-      Choice Kept
-    </span>
+    <div class="w3-row">
+      <select class="w3-select w3-light-grey w3-xlarge w3-col s10 m10 l10" id="depo">
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+        <option value="3">Option 3</option>
+      </select>
+      <div class="w3-col s2 m2 l2">
+        <a href="#" class="w3-button w3-light-grey w3-hover-light-grey w3-block w3-xlarge"><span style="font-weight: bold; color: red;" id="depoPref" data-toggle="on">&hearts;</span>
+        </a>
+      </div>
+    </div>
   </p>
   <p>
     <label>Managing Account</label>
-    <select class="w3-select w3-light-grey w3-xlarge" name="option">
-      <option value="1">Option 1</option>
-      <option value="2">Option 2</option>
-      <option value="3">Option 3</option>
-    </select>
-    <span class="w3-tag w3-blue w3-round-small">
-     Keep Choice
-    </span>
+    <div class="w3-row">
+      <select class="w3-select w3-light-grey w3-xlarge w3-col s10 m10 l10" id="mngAcc">
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+        <option value="3">Option 3</option>
+      </select>
+      <div class="w3-col s2 m2 l2">
+        <a href="#" class="w3-button w3-light-grey w3-hover-light-grey w3-block w3-xlarge"><span style="font-weight: bold; color: lightgrey;" id="mngAccPref" data-toggle="off">&hearts;</span>
+        </a>
+      </div>
+    </div>
   </p>
-  <a href="#" class="w3-btn w3-block w3-blue w3-margin-bottom">OK</a>
+  <a href="#" class="w3-button w3-block w3-blue w3-margin-bottom">OK</a>
 </div>

@@ -125,10 +125,10 @@ exports.asyncKeepFreqExpenseDepoMngAccPref = async function(ownerId, preferredDe
     try {
       var userPrefArr = [];
       if(preferredDepo) {
-        userPrefArr.push({ preferredDepo: preferredDepo });
+        userPrefArr.push({ preferredExpenseDepo: preferredDepo });
       };
       if(preferredMngAcc) {
-        userPrefArr.push({ preferredMngAcc: preferredMngAcc });
+        userPrefArr.push({ preferredExpenseMngAcc: preferredMngAcc });
       }
       resolve(datastoreSvc.saveUserPrefs(ownerId, userPrefArr));
     } catch(err) {

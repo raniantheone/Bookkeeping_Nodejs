@@ -1,124 +1,191 @@
 define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html"], function(clientUtil, skeletonMod, expenseHtml) {
 
   let displayName = "test expense client mod";
-  function InitData() {
-    this.availCombination = [];
-    this.depoOpts = [];
-    this.mngAccOpts = [];
-    this.userPref = {};
-    this.refresh = async function() {
 
-      this.availCombination = [];
-      this.depoOpts = [];
-      this.mngAccOpts = [];
-      this.userPref = {};
+  let expenseUi = {
+    contentNode: null,
+    iptItemName: null,
+    iptItemDesc: null,
+    iptTransAmount: null,
+    iptTransDateTime: null,
+    selectDepo: null,
+    depoPrefHeart: null,
+    selectMngAcc: null,
+    mngAccPrefHeart: null,
+    btnKeepExpenseOK: null
+  };
 
-      // TODO remove hardcode after auth implementation
+  let serverData = {
+    availCombination: [],
+    depoOpts: [],
+    mngAccOpts: [],
+    userPref: {}
+  };
+
+  function refreshExpenseUi() {
+    expenseUi.contentNode = new DOMParser().parseFromString(expenseHtml, "text/html").getElementById("funcKeepExpense");
+    expenseUi.iptItemName = expenseUi.contentNode.querySelector("#itemName");
+    expenseUi.iptItemDesc = expenseUi.contentNode.querySelector("#itemDesc");
+    expenseUi.iptTransAmount = expenseUi.contentNode.querySelector("#transAmount");
+    expenseUi.iptTransDateTime = expenseUi.contentNode.querySelector("#transDateTime");
+    expenseUi.selectDepo = expenseUi.contentNode.querySelector("#depo");
+    expenseUi.depoPrefHeart = expenseUi.contentNode.querySelector("#depoPref");
+    expenseUi.selectMngAcc = expenseUi.contentNode.querySelector("#mngAcc");
+    expenseUi.mngAccPrefHeart = expenseUi.contentNode.querySelector("#mngAccPref");
+    expenseUi.btnKeepExpenseOK = expenseUi.contentNode.querySelector("#keepExpenseOKBtn");
+  }
+
+  async function keepExpenseRecord() {
+    let payload = {
+      itemName: expenseUi.iptItemName.value,
+      itemDesc: expenseUi.iptItemDesc.value,
+      transAmount: expenseUi.iptTransAmount.value,
+      transDateTime: clientUtil.getDateObjFromDateIpt(expenseUi.iptTransDateTime.value).toISOString(),
+      transType: "expense",
+      transIssuer: "trista167@gmail.com", // TODO remove hardcode after auth implementation
+      depo: expenseUi.selectDepo.value,
+      mngAcc: expenseUi.selectMngAcc.value
+    };
+    if(expenseUi.depoPrefHeart.dataset.toggle == "on"
+      && !(serverData.userPref.preferredExpenseDepo == expenseUi.selectDepo.value)) {
+      payload.preferredExpenseDepo = expenseUi.selectDepo.value;
+    }else if(expenseUi.depoPrefHeart.dataset.toggle == "off"
+      && (serverData.userPref.preferredExpenseDepo == expenseUi.selectDepo.value)) {
+      payload.preferredExpenseDepo = null;
+    };
+    if(expenseUi.mngAccPrefHeart.dataset.toggle == "on"
+      && !(serverData.userPref.preferredExpenseMngAcc == expenseUi.selectMngAcc.value)) {
+      payload.preferredExpenseMngAcc = expenseUi.selectMngAcc.value;
+    }else if(expenseUi.mngAccPrefHeart.dataset.toggle == "off"
+      && (serverData.userPref.preferredExpenseMngAcc == expenseUi.selectMngAcc.value)) {
+      payload.preferredExpenseMngAcc = null;
+    };
+    console.log(payload);
+    let isSuccess = false;
+    try {
+      let operResult = await clientUtil.ajaxPost("TODO", payload);
+      isSuccess = operResult.isSuccess;
+      if(!isSuccess) {
+        console.log(operResult.error);
+      }
+    } catch(err) {
+      console.log(err);
+    };
+    return isSuccess;
+  }
+
+  async function refreshServerData() {
+    try {
       let res = await clientUtil.ajaxPost("/flow/expense/initData", {	ownerId: "trista167@gmail.com"});
       if(res.isSuccess) {
-        this.availCombination = res.payload.availCombination;
-        this.userPref = res.payload.userPref;
+        serverData.availCombination = res.payload.availCombination;
+        serverData.userPref = res.payload.userPref;
+
+        serverData.depoOpts = [];
+        serverData.mngAccOpts = [];
+
         let uniqueDepoIds = [];
         let uniqueMngAccIds = [];
-        this.availCombination.forEach((combo) => {
+        serverData.availCombination.forEach((combo) => {
           if(!uniqueDepoIds.includes(combo.depoId)) {
             uniqueDepoIds.push(combo.depoId);
-            this.depoOpts.push({
+            serverData.depoOpts.push({
               id: combo.depoId,
               displayName: combo.depoDisplayName
             });
           };
           if(!uniqueMngAccIds.includes(combo.mngAccId)) {
             uniqueMngAccIds.push(combo.mngAccId);
-            this.mngAccOpts.push({
+            serverData.mngAccOpts.push({
               id: combo.mngAccId,
               displayName: combo.mngAccDisplayName
             });
           };
         });
       }else{
-        // TODO error handling
-      }
-    }
-  }
+        console.log(res.error);
+      };
+    } catch(err) {
+      console.log(err);
+    };
+  };
 
-  async function getInitContentNode() {
-
-    var contentNode = new DOMParser().parseFromString(expenseHtml, "text/html").getElementById("funcKeepExpense");
-
-    var initData = new InitData();
-    await initData.refresh();
-
-    var depoSelect = contentNode.querySelector("#depo");
-    depoSelect.innerHTML = "";
-    initData.depoOpts.forEach((optData) => {
-      var opt = document.createElement("option");
+  function setUpSelectDepoAndPref() {
+    expenseUi.selectDepo.innerHTML = "";
+    serverData.depoOpts.forEach((optData) => {
+      let opt = document.createElement("option");
       opt.textContent = optData.displayName;
       opt.value = optData.id;
-      depoSelect.appendChild(opt);
-      if(initData.userPref.preferredExpenseDepo && initData.userPref.preferredExpenseDepo == opt.value) {
+      expenseUi.selectDepo.appendChild(opt);
+      if(serverData.userPref.preferredExpenseDepo && serverData.userPref.preferredExpenseDepo == opt.value) {
         opt.setAttribute("selected", true);
       };
     });
+  };
 
-    var mngAccSelect = contentNode.querySelector("#mngAcc");
-    function setMngAccOptsByDepo(depoId) {
-      mngAccSelect.innerHTML = "";
-
-      var matchedComboMngAccIds = initData.availCombination.filter((combo) => {
-        return depoId == combo.depoId;
-      }).map((matchedCombo) => {
-        return matchedCombo.mngAccId;
-      });
-      var availMngAccOpts = initData.mngAccOpts.filter((optData) => {
-        return matchedComboMngAccIds.includes(optData.id);
-      });
-      availMngAccOpts.forEach((optData) => {
-        var opt = document.createElement("option");
-        opt.textContent = optData.displayName;
-        opt.value = optData.id;
-        mngAccSelect.appendChild(opt);
-        if(initData.userPref.preferredExpenseMngAcc && initData.userPref.preferredExpenseMngAcc == opt.value) {
-          opt.setAttribute("selected", true);
-        };
-      });
-    }
-    setMngAccOptsByDepo(depoSelect.value);
-
-    // TODO preference pre-select here
-    var depoPref = contentNode.querySelector("#depoPref");
-    function checkPreferredDepoOption() {
-      if(initData.userPref.preferredExpenseDepo && initData.userPref.preferredExpenseDepo == depoSelect.value) {
-        depoPref.setAttribute("style", "font-weight: bold; color: red");
-        depoPref.dataset.toggle = "on";
-      }else{
-        depoPref.setAttribute("style", "font-weight: bold; color: lightgrey");
-        depoPref.dataset.toggle = "off";
-      };
-    };
-    checkPreferredDepoOption();
-
-    var mngAccPref = contentNode.querySelector("#mngAccPref");
-    function checkPreferredMngAccOption() {
-      if(initData.userPref.preferredExpenseMngAcc && initData.userPref.preferredExpenseMngAcc == mngAccSelect.value) {
-        mngAccPref.setAttribute("style", "font-weight: bold; color: red");
-        mngAccPref.dataset.toggle = "on";
-      }else{
-        mngAccPref.setAttribute("style", "font-weight: bold; color: lightgrey");
-        mngAccPref.dataset.toggle = "off";
-      };
-    };
-    checkPreferredMngAccOption();
-
-    contentNode.querySelector("#transDateTime").value = clientUtil.getDateIptStr(new Date());
-
-    depoSelect.addEventListener("change", function() {
-      setMngAccOptsByDepo(depoSelect.value);
-      checkPreferredDepoOption();
-      checkPreferredMngAccOption();
+  function setUpSelectMngAccAndPrefByDepo(depoId) {
+    expenseUi.selectMngAcc.innerHTML = "";
+    let matchedComboMngAccIds = serverData.availCombination.filter((combo) => {
+      return depoId == combo.depoId;
+    }).map((matchedCombo) => {
+      return matchedCombo.mngAccId;
     });
+    let availMngAccOpts = serverData.mngAccOpts.filter((optData) => {
+      return matchedComboMngAccIds.includes(optData.id);
+    });
+    availMngAccOpts.forEach((optData) => {
+      var opt = document.createElement("option");
+      opt.textContent = optData.displayName;
+      opt.value = optData.id;
+      expenseUi.selectMngAcc.appendChild(opt);
+      if(serverData.userPref.preferredExpenseMngAcc && serverData.userPref.preferredExpenseMngAcc == opt.value) {
+        opt.setAttribute("selected", true);
+      };
+    });
+  };
 
-    mngAccSelect.addEventListener("change", checkPreferredMngAccOption);
+  function checkAndSetDepoHeart() {
+    if(serverData.userPref.preferredExpenseDepo && serverData.userPref.preferredExpenseDepo == expenseUi.selectDepo.value) {
+      expenseUi.depoPrefHeart.setAttribute("style", "font-weight: bold; color: red");
+      expenseUi.depoPrefHeart.dataset.toggle = "on";
+    }else{
+      expenseUi.depoPrefHeart.setAttribute("style", "font-weight: bold; color: lightgrey");
+      expenseUi.depoPrefHeart.dataset.toggle = "off";
+    };
+  };
+
+  function checkAndSetMngAccHeart() {
+    if(serverData.userPref.preferredExpenseMngAcc && serverData.userPref.preferredExpenseMngAcc == expenseUi.selectMngAcc.value) {
+      expenseUi.mngAccPrefHeart.setAttribute("style", "font-weight: bold; color: red");
+      expenseUi.mngAccPrefHeart.dataset.toggle = "on";
+    }else{
+      expenseUi.mngAccPrefHeart.setAttribute("style", "font-weight: bold; color: lightgrey");
+      expenseUi.mngAccPrefHeart.dataset.toggle = "off";
+    };
+  };
+
+  async function getInitializedContentNode() {
+
+    refreshExpenseUi();
+    await refreshServerData();
+
+    // pop depo select and pref
+    setUpSelectDepoAndPref();
+    checkAndSetDepoHeart();
+
+    // pop mngAcc select and pref
+    setUpSelectMngAccAndPrefByDepo(expenseUi.selectDepo.value);
+    checkAndSetMngAccHeart();
+
+    expenseUi.iptTransDateTime.value = clientUtil.getDateIptStr(new Date());
+
+    // register all event handlers
+    expenseUi.selectDepo.addEventListener("change", function() {
+      setUpSelectMngAccAndPrefByDepo(expenseUi.selectDepo.value);
+      checkAndSetDepoHeart();
+      checkAndSetMngAccHeart();
+    });
+    expenseUi.selectMngAcc.addEventListener("change", checkAndSetMngAccHeart);
 
     function togglePreference() {
       if(this.dataset.toggle == "on") {
@@ -129,17 +196,67 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html
         this.dataset.toggle = "on";
       }
     }
+    expenseUi.depoPrefHeart.addEventListener("click", togglePreference);
+    expenseUi.mngAccPrefHeart.addEventListener("click", togglePreference);
 
-    depoPref.addEventListener("click", togglePreference);
+    expenseUi.btnKeepExpenseOK.addEventListener("click", function() {
 
-    mngAccPref.addEventListener("click", togglePreference);
+      var itemNameValidator = clientUtil.createValidator(
+        expenseUi.iptItemName,
+        (itemNameVal) => { return itemNameVal.length > 0; },
+        "Please provide item name."
+      );
+      var transAmountValidator = clientUtil.createValidator(
+        expenseUi.iptTransAmount,
+        (transAmountVal) => { return transAmountVal > 0; },
+        "Please provide positive expense amount."
+      );
+      var validationResult = clientUtil.validateAll([itemNameValidator, transAmountValidator]);
 
-    return contentNode;
+      var modalContentNode = document.createElement("p");
+      var modalHeaderNode = document.createElement("span");
+      if(validationResult.allPassed) {
+        modalHeaderNode.textContent = "Confirm Expense";
+        modalContentNode.textContent = "Spend "
+          + expenseUi.iptTransAmount.value
+          + " on "
+          + expenseUi.iptItemName.value
+          + " from "
+          + expenseUi.selectDepo.options[expenseUi.selectDepo.selectedIndex].text
+          + " - " + expenseUi.selectMngAcc.options[expenseUi.selectMngAcc.selectedIndex].text + " ?";
+        skeletonMod.configureModal(
+          modalHeaderNode
+          , modalContentNode
+          , () => { alert("not implemented yet"); }
+          , null
+        );
+      }else{
+        modalHeaderNode.textContent = "Heads Up!";
+        modalContentNode.textContent = "Cannot keep this record, please refer to the advice below:";
+        var errorList = document.createElement("ul");
+        modalContentNode.appendChild(errorList);
+        validationResult.errArr.forEach((errValidator) => {
+          var listItem = document.createElement("li");
+          listItem.textContent = errValidator.errMsg;
+          errorList.appendChild(listItem);
+        });
+        skeletonMod.configureModal(
+          modalHeaderNode
+          , modalContentNode
+          , null
+          , null
+        );
+      }
+      skeletonMod.openModal();
+
+    });
+
+    return expenseUi.contentNode;
   };
 
   return {
     initialize: async function() {
-      skeletonMod.loadFunctionContent(await getInitContentNode());
+      skeletonMod.loadFunctionContent(await getInitializedContentNode());
       skeletonMod.loadFunctionHeader(displayName);
     },
     getDisplayName: function() {

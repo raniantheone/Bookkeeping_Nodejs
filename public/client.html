@@ -40,9 +40,7 @@
     <nav class="w3-sidebar w3-bar-block w3-black w3-large w3-animate-left" style="display:none" id="sideNav">
       <a href="javascript:void(0)" class="w3-button w3-black w3-right" id="sideNavCloseBtn">&times;</a><br>
       <div id="navFunctionList">
-        <a class="w3-bar-item w3-button" href="#">Function 1</a>
-        <a class="w3-bar-item w3-button" href="#">Function 2</a>
-        <a class="w3-bar-item w3-button" href="#">Function 3</a>
+        <!-- <a class="w3-bar-item w3-button" href="#">Function 1</a> -->
       <div>
     </nav>
 
@@ -60,20 +58,20 @@
     <div id="modalContainer" class="w3-modal">
       <div class="w3-modal-content w3-card-4 w3-animate-opacity">
         <header class="w3-container">
-          <span onclick="document.getElementById('modalContainer').style.display='none'" class="w3-button w3-display-topright">
+          <span onclick="document.getElementById('modalContainer').style.display='none'" class="w3-button w3-display-topright" id="modalCancelCross">
             &times;
           </span>
           <h3 id="modalHeader">Modal Header</h3>
         </header>
         <div class="w3-container" id="modalContentContainer">
-          <p>Modal Content</p>
+          <!-- <p>Modal Content</p> -->
         </div>
         <footer class="w3-container w3-row">
           <div class="w3-padding w3-col s6 m6 l6">
-            <a href="#" class="w3-btn w3-block w3-blue">Confirm</a>
+            <a href="#" class="w3-btn w3-block w3-blue" id="modalConfirmBtn">Confirm</a>
           </div>
           <div class="w3-padding w3-col s6 m6 l6">
-            <a href="#" class="w3-btn w3-block w3-deep-orange">Cancel</a>
+            <a href="#" class="w3-btn w3-block w3-deep-orange" id="modalCancelBtn">Cancel</a>
           </div>
         </footer>
       </div>

@@ -1,12 +1,35 @@
 define(function() {
 
-  var sideNav = document.getElementById("sideNav");
-  document.getElementById("sideNavOpenBtn").addEventListener("click", function() {
-    sideNav.style.display = "block";
-  });
-  document.getElementById("sideNavCloseBtn").addEventListener("click", function() {
-    sideNav.style.display = "none";
-  });
+  var modalHeader = document.getElementById("modalHeader");
+  var modalContentContainer = document.getElementById("modalContentContainer");
+  var modalCancelCross = document.getElementById("modalCancelCross");
+  var modalConfirmBtn = document.getElementById("modalConfirmBtn");
+  var modalCancelBtn = document.getElementById("modalCancelBtn");
+
+  function openSideNav() {
+    document.getElementById("sideNav").style.display = "block";
+  }
+
+  function closeSideNav() {
+    document.getElementById("sideNav").style.display = "none";
+  }
+
+  function openModal() {
+    document.getElementById("modalContainer").style.display="block";
+  }
+
+  function closeModal() {
+    document.getElementById("modalContainer").style.display="none";
+  }
+
+  function execIfItsAFunction(expectedFunction) {
+    if(typeof expectedFunction == "function") {
+      expectedFunction();
+    }
+  }
+
+  document.getElementById("sideNavOpenBtn").addEventListener("click", openSideNav);
+  document.getElementById("sideNavCloseBtn").addEventListener("click", closeSideNav);
 
   return {
     registerNavFunction: function(functionMod) {
@@ -14,7 +37,10 @@ define(function() {
       navFunctionItem.setAttribute("class", "w3-bar-item w3-button");
       navFunctionItem.setAttribute("href", "#");
       navFunctionItem.textContent = functionMod.getDisplayName();
-      navFunctionItem.addEventListener("click", functionMod.initialize);
+      navFunctionItem.onclick = function() {
+        functionMod.initialize();
+        closeSideNav();
+      };
       document.getElementById("navFunctionList").appendChild(navFunctionItem);
     },
     loadFunctionContent: function(contentNode) {
@@ -27,40 +53,29 @@ define(function() {
       functionNameHeader.textContent = "";
       functionNameHeader.textContent = headerText;
     },
+    configureModal: function(modalHeaderNode, modalContentNode, confirmHandler, cancelHandler) {
 
+      modalHeader.innerHTML = "";
+      modalHeader.appendChild(modalHeaderNode);
 
-
-    initSkeleton: function() {
-
-      // Load function list in sideNav
-
-      // Register click handler which loads function content for each function in sideNav
-
-      // Load default function
-
-    },
-    openSideNav: function() {
-      document.getElementById("sideNav").style.display = "block";
-    },
-    closeSideNav: function() {
-      document.getElementById("sideNav").style.display = "none";
-    },
-    openModal: function(functionModule) {
-
-      var modalHeader = document.getElementById("modalHeader");
-      var modalContentContainer = document.getElementById("modalContentContainer");
-      modalHeader.textContent = "";
       modalContentContainer.innerHTML = "";
+      modalContentContainer.appendChild(modalContentNode);
 
-      modalHeader.textContent = functionModule.getModalHeaderText();
-      modalContentContainer.appendChild(functionModule.getModalContent());
-
-      document.getElementById("modalContainer").style.display="block";
+      modalCancelCross.onclick = function() {
+        execIfItsAFunction(cancelHandler);
+        closeModal();
+      };
+      modalConfirmBtn.onclick = function() {
+        execIfItsAFunction(confirmHandler);
+        closeModal();
+      };
+      modalCancelBtn.onclick = function() {
+        execIfItsAFunction(cancelHandler);
+        closeModal();
+      };
 
     },
-    closeModal: function() {
-      document.getElementById("modalContainer").style.display="none";
-    }
-
+    openModal: openModal,
+    closeModal: closeModal
   };
 });

@@ -36,6 +36,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html
   }
 
   async function keepExpenseRecord() {
+    skeletonMod.showLoadingSpinner();
     let payload = {
       itemName: expenseUi.iptItemName.value,
       itemDesc: expenseUi.iptItemDesc.value,
@@ -63,13 +64,54 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html
     console.log(payload);
     let isSuccess = false;
     try {
-      let operResult = await clientUtil.ajaxPost("TODO", payload);
-      isSuccess = operResult.isSuccess;
-      if(!isSuccess) {
+      // for ui test
+      // await new Promise((resolve, reject) => {
+      //   setTimeout(() => { console.log("test waiting"); resolve(); }, 1000);
+      // });
+      let operResult = await clientUtil.ajaxPost("/flow/expense/keepRecord", payload);
+      skeletonMod.hideLoadingSpinner();
+
+      // TODO flash success or show error notification
+      if(Array.isArray(operResult.payload)) {
+        let modalHeaderNode = document.createElement("span");
+        modalHeaderNode.textContent = "Warning";
+        let modalContentNode = document.createElement("p");
+        modalContentNode.textContent = "Either you're testing the application, or someone is doing some tricky thing with your browser";
+        let backendValidErrList = document.createElement("ul");
+        operResult.payload.forEach((validErr) => {
+          let item = document.createElement("li");
+          item.textContent = validErr;
+          backendValidErrList.appendChild(item);
+        });
+        modalContentNode.appendChild(backendValidErrList);
+        skeletonMod.configureModal(
+          modalHeaderNode
+          , modalContentNode
+          , null
+          , null
+        );
+      }else if(!operResult.isSuccess) {
         console.log(operResult.error);
+        throw new Error("Backend Error");
+      }else{
+        isSuccess = true;
+        await skeletonMod.flashSuccessHint();
+        skeletonMod.loadFunctionContent(await getInitializedContentNode());
       }
+
     } catch(err) {
+      skeletonMod.hideLoadingSpinner();
       console.log(err);
+      let modalHeaderNode = document.createElement("span");
+      modalHeaderNode.textContent = "Oops...";
+      let modalContentNode = document.createElement("p");
+      modalContentNode.textContent = "Please notify system admin with this message: " + err + " ... at " + new Date().toISOString();
+      skeletonMod.configureModal(
+        modalHeaderNode
+        , modalContentNode
+        , null
+        , null
+      );
     };
     return isSuccess;
   }
@@ -227,11 +269,11 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html
         skeletonMod.configureModal(
           modalHeaderNode
           , modalContentNode
-          , () => { alert("not implemented yet"); }
+          , keepExpenseRecord
           , null
         );
       }else{
-        modalHeaderNode.textContent = "Heads Up!";
+        modalHeaderNode.textContent = "Oops...";
         modalContentNode.textContent = "Cannot keep this record, please refer to the advice below:";
         var errorList = document.createElement("ul");
         modalContentNode.appendChild(errorList);

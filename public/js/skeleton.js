@@ -3,8 +3,11 @@ define(function() {
   var modalHeader = document.getElementById("modalHeader");
   var modalContentContainer = document.getElementById("modalContentContainer");
   var modalCancelCross = document.getElementById("modalCancelCross");
-  var modalConfirmBtn = document.getElementById("modalConfirmBtn");
-  var modalCancelBtn = document.getElementById("modalCancelBtn");
+  var modalNextActionBtn = document.getElementById("modalNextActionBtn");
+  var modalAbortBtn = document.getElementById("modalAbortBtn");
+  var modalBgBase = document.getElementById("modalBgBase");
+  var loadingSpinner = document.getElementById("loadingSpinner");
+  var hintSuccess = document.getElementById("hintSuccess");
 
   function openSideNav() {
     document.getElementById("sideNav").style.display = "block";
@@ -22,10 +25,30 @@ define(function() {
     document.getElementById("modalContainer").style.display="none";
   }
 
-  function execIfItsAFunction(expectedFunction) {
+  async function execIfItsAFunction(expectedFunction) {
     if(typeof expectedFunction == "function") {
-      expectedFunction();
+      return await expectedFunction();
     }
+  }
+
+  function showLoadingSpinner() {
+    modalBgBase.style.display="none";
+    loadingSpinner.style.display="block";
+  }
+
+  function hideLoadingSpinner() {
+    loadingSpinner.style.display="none";
+    modalBgBase.style.display="block";
+  }
+
+  function showSuccessHint() {
+    modalBgBase.style.display="none";
+    hintSuccess.style.display="block";
+  }
+
+  function hideSuccessHint() {
+    hintSuccess.style.display="none";
+    modalBgBase.style.display="block";
   }
 
   document.getElementById("sideNavOpenBtn").addEventListener("click", openSideNav);
@@ -53,7 +76,7 @@ define(function() {
       functionNameHeader.textContent = "";
       functionNameHeader.textContent = headerText;
     },
-    configureModal: function(modalHeaderNode, modalContentNode, confirmHandler, cancelHandler) {
+    configureModal: function(modalHeaderNode, modalContentNode, nextActionHandler, abortHandler) {
 
       modalHeader.innerHTML = "";
       modalHeader.appendChild(modalHeaderNode);
@@ -62,20 +85,45 @@ define(function() {
       modalContentContainer.appendChild(modalContentNode);
 
       modalCancelCross.onclick = function() {
-        execIfItsAFunction(cancelHandler);
+        execIfItsAFunction(abortHandler);
         closeModal();
       };
-      modalConfirmBtn.onclick = function() {
-        execIfItsAFunction(confirmHandler);
+      modalNextActionBtn.onclick = async function() {
+        let nextActionSucceed = await execIfItsAFunction(nextActionHandler);
+        if(nextActionSucceed) {
+          closeModal(); // nextActionHandler will configure modal again if the action is not fulfilled
+        };
+      };
+      modalAbortBtn.onclick = function() {
+        execIfItsAFunction(abortHandler);
         closeModal();
       };
-      modalCancelBtn.onclick = function() {
-        execIfItsAFunction(cancelHandler);
-        closeModal();
+
+      let divAbortBtn = modalAbortBtn.parentNode;
+      let divNextActionBtn = modalNextActionBtn.parentNode;
+      if(nextActionHandler == null) {
+        modalAbortBtn.textContent = "Got it";
+        divAbortBtn.setAttribute("class", "w3-padding w3-col s12 m12 l12");
+        divNextActionBtn.style.display = "none";
+      }else{
+        modalAbortBtn.textContent = "Abort";
+        divAbortBtn.setAttribute("class", "w3-padding w3-col s6 m6 l6");
+        divNextActionBtn.style.display = "block";
       };
 
     },
     openModal: openModal,
-    closeModal: closeModal
+    closeModal: closeModal,
+    showLoadingSpinner: showLoadingSpinner,
+    hideLoadingSpinner: hideLoadingSpinner,
+    flashSuccessHint: async function() {
+      showSuccessHint();
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          hideSuccessHint();
+          resolve();
+        }, 1000);
+      });
+    }
   };
 });

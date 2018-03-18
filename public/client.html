@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- UI style from: w3.css -->
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
     <script>
       /**
       For developing and debugging
@@ -56,9 +57,18 @@
 
     <!-- Load dynamic modal content here -->
     <div id="modalContainer" class="w3-modal">
-      <div class="w3-modal-content w3-card-4 w3-animate-opacity">
+      <!-- Loading Spinner -->
+      <div class="w3-display-middle" id="loadingSpinner" style="display: none">
+        <i class="fa fa-5x fa-spinner fa-spin"></i>
+      </div>
+      <!-- Success Hint -->
+      <div class="w3-display-middle" id="hintSuccess" style="display: none">
+        <i class="fas fa-check fa-10x w3-animate-opacity" style="color: green"></i>
+      </div>
+      <!-- Modal Begins -->
+      <div class="w3-modal-content w3-card-4 w3-animate-opacity" id="modalBgBase">
         <header class="w3-container">
-          <span onclick="document.getElementById('modalContainer').style.display='none'" class="w3-button w3-display-topright" id="modalCancelCross">
+          <span class="w3-button w3-display-topright" id="modalCancelCross">
             &times;
           </span>
           <h3 id="modalHeader">Modal Header</h3>
@@ -68,10 +78,10 @@
         </div>
         <footer class="w3-container w3-row">
           <div class="w3-padding w3-col s6 m6 l6">
-            <a href="#" class="w3-btn w3-block w3-blue" id="modalConfirmBtn">Confirm</a>
+            <a href="#" class="w3-btn w3-block w3-blue" id="modalNextActionBtn">Confirm</a>
           </div>
           <div class="w3-padding w3-col s6 m6 l6">
-            <a href="#" class="w3-btn w3-block w3-deep-orange" id="modalCancelBtn">Cancel</a>
+            <a href="#" class="w3-btn w3-block w3-deep-orange" id="modalAbortBtn">Abort</a>
           </div>
         </footer>
       </div>

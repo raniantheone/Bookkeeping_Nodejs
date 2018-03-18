@@ -118,6 +118,16 @@ DepositoryInfoLocked --> DepositoryInfoDeleted
 DepositoryInfoDeleted --> [*]
 ```
 
+```puml
+title Skeleton Modal State Transition
+[*] --> Empty
+Empty --> PromptNextOrAbort : Attempt Valid
+PromptNextOrAbort --> HintSuccess : Next Action Fulfilled
+HintSuccess --> [*]
+PromptNextOrAbort --> PromptAbort : Next Action Failed
+Empty --> PromptAbort : Attempt Is Not Valid
+PromptAbort --> [*]
+```
 
 ## Analysis
 

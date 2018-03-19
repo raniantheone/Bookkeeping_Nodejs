@@ -5,7 +5,7 @@ require.config({
   }
 });
 
-require(["skeleton", "function/expense"], function(skeletonMod, expenseMod) {
+require(["skeleton", "function/expense", "function/income"], function(skeletonMod, expenseMod, incomeMod) {
 
   /**
   * Initialize side nav:
@@ -13,6 +13,7 @@ require(["skeleton", "function/expense"], function(skeletonMod, expenseMod) {
   * 2. Register click event handler for initializing function content
   */
   skeletonMod.registerNavFunction(expenseMod);
+  skeletonMod.registerNavFunction(incomeMod);
 
   /**
   * Initialize default function content

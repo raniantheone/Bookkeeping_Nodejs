@@ -24,7 +24,8 @@ exports.getInitDepoMngAccAndPref = async function(req, res) {
     ]);
 
     if(checkResult.allValidated) {
-      respContent.payload = await incomeProc.getInitDepoMngAccPrefAndMapping(req.body.ownerId);
+      // respContent.payload = await incomeProc.getInitDepoMngAccPrefAndMapping(req.body.ownerId);
+      respContent.payload = await incomeProc.getInitDepoMngAccAndPref(req.body.ownerId);
     } else {
       respContent.payload = checkResult.allGuards.filter(function(guard) {
         return !guard.isValid;

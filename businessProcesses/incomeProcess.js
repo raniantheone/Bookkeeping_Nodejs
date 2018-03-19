@@ -104,3 +104,52 @@ exports.saveIncomeRecord = async function(itemName, itemDesc, transAmount, trans
   }
   return operSuccess;
 }
+
+
+
+
+// TODO merge expense and income to the same module
+
+exports.getInitDepoMngAccAndPref = async function(ownerId) {
+  var initializedDepoMngAccAndUserPref = {
+    availCombination: [],
+    userPref: {}
+  };
+  try {
+
+    var queryResultArr = await Promise.all([
+      datastoreSvc.queryExistingUser(ownerId),
+      datastoreSvc.queryDepoMngAccWithInitValue(ownerId)
+    ]);
+
+    var user = queryResultArr[0];
+    initializedDepoMngAccAndUserPref.userPref = user.prefs || {};
+
+    var initAndMappingDataArr = queryResultArr[1];
+    var depoMap = {};
+    var mngAccMap = {};
+    for(let entry of initAndMappingDataArr) {
+      if(entry.type == "depo") {
+        depoMap[ entry.id ] = entry.displayName;
+      }else if(entry.type == "mngAcc") {
+        mngAccMap[ entry.id ] = entry.displayName;
+      }else if(entry.type == "income" && entry.transType == "init") {
+        var combo = {
+          depoId: entry.depo,
+          depoDisplayName: null,
+          mngAccId: entry.mngAcc,
+          mngAccDisplayName: null
+        };
+        initializedDepoMngAccAndUserPref.availCombination.push(combo);
+      }
+    }
+    initializedDepoMngAccAndUserPref.availCombination.forEach((combo) => {
+      combo.depoDisplayName = depoMap[combo.depoId];
+      combo.mngAccDisplayName = mngAccMap[combo.mngAccId];
+    });
+
+  } catch(err) {
+    console.log(err + " <-- err happend; process layer - getInitDepoMngAccAndPref consumes it and returns default value");
+  }
+  return initializedDepoMngAccAndUserPref;
+}

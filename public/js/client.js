@@ -5,7 +5,7 @@ require.config({
   }
 });
 
-require(["skeleton", "function/expense", "function/income"], function(skeletonMod, expenseMod, incomeMod) {
+require(["skeleton", "function/expense", "function/income", "function/configuration"], function(skeletonMod, expenseMod, incomeMod, configMod) {
 
   /**
   * Initialize side nav:
@@ -14,10 +14,12 @@ require(["skeleton", "function/expense", "function/income"], function(skeletonMo
   */
   skeletonMod.registerNavFunction(expenseMod);
   skeletonMod.registerNavFunction(incomeMod);
+  skeletonMod.registerNavFunction(configMod);
 
   /**
   * Initialize default function content
   */
-  expenseMod.initialize();
+  // expenseMod.initialize();
+  configMod.initialize();
 
 });

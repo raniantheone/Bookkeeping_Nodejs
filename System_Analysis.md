@@ -129,6 +129,21 @@ Empty --> PromptAbort : Attempt Is Not Valid
 PromptAbort --> [*]
 ```
 
+```puml
+title Depository Item in Configuration Module
+[*] --> Empty
+[*] --> Read
+Empty --> Edit : add
+Edit --> Read : confirm adding
+Edit --> Empty : abort adding
+Edit --> Read : abort editing
+Edit --> Read : confirm editing
+Read --> Edit : edit
+Read --> Destroyed : delete
+Read --> [*]
+Destroyed --> [*]
+```
+
 ## Analysis
 
 ### Activity Flow

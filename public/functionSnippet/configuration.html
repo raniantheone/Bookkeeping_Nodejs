@@ -1,0 +1,123 @@
+<div class="w3-container w3-margin-top w3-margin-bottom" id="funcConfiguration">
+
+
+  <button class="w3-button w3-block w3-blue w3-left-align" id="depoListToggle">Depository</button>
+  <ul class="w3-ul" id="depoList" style="display:none">
+    <li class="w3-row w3-large" style="display:none" id="depoItemTmpl_Read_">
+      <div class="w3-col s10 m10 l10" name="displayName">Depo Name</div>
+      <div class="w3-col s1 m1 l1 w3-center" style="transform:rotate(140deg)" name="editBtn">
+        &#10001;
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" name="deleteBtn">
+        &#9473;
+      </div>
+    </li>
+    <li class="w3-row w3-large" style="border:2px dotted #8bc34a; display:none" id="depoItemTmpl_Edit_">
+      <div class="w3-col s10 m10 l10">
+        <input type="text" style="border-style:solid; border-width:1px; border-color:gray" name="displayName">
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center" name="confirmBtn">
+        &#128504;
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" name="cancelBtn">
+        &#10060;
+      </div>
+    </li>
+    <li class="w3-row w3-large" style="display:none" id="depoItem_Add">
+      <div class="w3-col s11 m11 l11">&nbsp;</div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" style="font-weight:bold" name="addBtn">
+        &#43;
+      </div>
+    </li>
+  </ul>
+
+
+  <button class="w3-button w3-block w3-blue w3-left-align" id="mngAccListToggle">Managing Account</button>
+  <ul class="w3-ul" id="mngAccList">
+    <li class="w3-row w3-large" id="mngAccItemTmpl_Read_">
+      <div class="w3-col s10 m10 l10" name="displayName">Depo Name</div>
+      <div class="w3-col s1 m1 l1 w3-center" style="transform:rotate(140deg)" name="editBtn">
+        &#10001;
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" name="deleteBtn">
+        &#9473;
+      </div>
+    </li>
+    <li class="w3-row w3-large" style="border:2px dotted #8bc34a" id="mngAccItemTmpl_Edit_">
+      <div class="w3-col s10 m10 l10">
+        <input type="text" style="border-style:solid; border-width:1px; border-color:gray" name="displayName">
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center" name="confirmBtn">
+        &#128504;
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" name="cancelBtn">
+        &#10060;
+      </div>
+    </li>
+    <li class="w3-row w3-large" id="mngAccItem_Add">
+      <div class="w3-col s11 m11 l11">&nbsp;</div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" style="font-weight:bold" name="addBtn">
+        &#43;
+      </div>
+    </li>
+  </ul>
+
+
+  <button class="w3-button w3-block w3-blue w3-left-align" id="comboListToggle">Initialized Combination</button>
+  <ul class="w3-ul" id="comboList">
+    <li class="w3-row w3-large"  style="border:2px dotted #8bc34a" id="comboItemTmpl_InitEdit_">
+      <div class="w3-col s12 m12 l12">
+        <select class="w3-select w3-light-grey" style="border:none" name="depoSelect">
+          <option>Depo name</option>
+          <option>Depo name</option>
+        </select>
+      </div>
+      <div class="w3-col s12 m12 l12">
+        <select class="w3-select w3-light-grey" style="border:none" name="mngAccSelect">
+          <option>MngAcc name</option>
+          <option>MngAcc name</option>
+        </select>
+      </div>
+      <div class="w3-col s10 m10 l10">
+        <input type="number" style="border-style:solid; border-width:1px; border-color:gray" name="initAmount">
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center" name="confirmBtn">
+        &#128504;
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" name="cancelBtn">
+        &#10060;
+      </div>
+    </li>
+    <li class="w3-row w3-large" id="comboItemTmpl_Read_">
+      <div class="w3-col s12 m12 l12" name="depoDisplayName">Depo Name</div>
+      <div class="w3-col s12 m12 l12" name="mngAccDisplayName">MngAcc Name</div>
+      <div class="w3-col s10 m10 l10" name="initAmount">Amount</div>
+      <div class="w3-col s1 m1 l1 w3-center" style="transform:rotate(140deg)" name="editBtn">
+        &#10001;
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" name="deleteBtn">
+        &#9473;
+      </div>
+    </li>
+    <li class="w3-row w3-large"  style="border:2px dotted #8bc34a" id="comboItemTmpl_Edit_">
+      <div class="w3-col s12 m12 l12" name="depoDisplayName">Depo Name</div>
+      <div class="w3-col s12 m12 l12" name="mngAccDisplayName">MngAcc Name</div>
+      <div class="w3-col s10 m10 l10">
+        <input type="number" style="border-style:solid; border-width:1px; border-color:gray" name="transAmount">
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center" name="confirmBtn">
+        &#128504;
+      </div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" name="cancelBtn">
+        &#10060;
+      </div>
+    </li>
+    <li class="w3-row w3-large" id="comboItem_Add">
+      <div class="w3-col s11 m11 l11">&nbsp;</div>
+      <div class="w3-col s1 m1 l1 w3-center w3-right-align" style="font-weight:bold" name="addBtn">
+        &#43;
+      </div>
+    </li>
+  </ul>
+
+</div>

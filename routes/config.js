@@ -26,4 +26,7 @@ router.post("/deleteMngAcc", configController.deleteManagingAccount);
 // set initial value for a depo-mngAcc
 router.post("/initializeDepoMngAcc", configController.initializeDepositoryManagingAccount);
 
+// delete an initialized combo
+router.post("/deleteInitializedCombo", configController.deleteInitializedCombo);
+
 module.exports = router;

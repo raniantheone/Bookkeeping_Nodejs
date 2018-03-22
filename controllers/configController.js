@@ -154,9 +154,17 @@ exports.deleteDepository = async function(req, res) {
       , "owner does not have this depo"
       , req.body.ownerId
       , req.body.depoId);
+    var depoNotInUseGuard = vldUtil.createGuard(
+      configProc.depoIsNotInUse
+      , "no initialized combo use this depo"
+      , "this depo is used in some initialized combo"
+      , req.body.ownerId
+      , req.body.depoId
+    );
     var checkResult = await vldUtil.asyncGuardsCheck([
       ownerIdGuard,
-      depoIdGuard
+      depoIdGuard,
+      depoNotInUseGuard
     ]);
 
     if(checkResult.allValidated) {
@@ -308,9 +316,17 @@ exports.deleteManagingAccount = async function(req, res) {
       , "owner does not have this mngAcc"
       , req.body.ownerId
       , req.body.mngAccId);
+    var mngAccIsNotInUse = vldUtil.createGuard(
+      configProc.mngAccIsNotInUse
+      , "no initialized combo use this mngAcc"
+      , "this mngAcc is used in some initialized combo"
+      , req.body.ownerId
+      , req.body.mngAccId
+    );
     var checkResult = await vldUtil.asyncGuardsCheck([
       ownerIdGuard,
-      mngAccIdGuard
+      mngAccIdGuard,
+      mngAccIsNotInUse
     ]);
 
     if(checkResult.allValidated) {
@@ -375,6 +391,60 @@ exports.initializeDepositoryManagingAccount = async function(req, res) {
 
     if(checkResult.allValidated) {
       respContent.payload = await configProc.initDepoMngAcc(req.body.ownerId, req.body.depoId, req.body.mngAccId, req.body.initAmount);
+    }else{
+      respContent.payload = checkResult.allGuards.filter(function(guard) {
+        return !guard.isValid;
+      }).map((guard) => {
+        return guard.resultMsg
+      });
+    }
+
+  } catch(err) {
+    console.log(err);
+    respContent.isSuccess = false;
+    respContent.error = err;
+  }
+  res.json(respContent);
+
+}
+
+exports.deleteInitializedCombo = async function(req, res) {
+
+  console.log("deleteInitializedCombo invoked");
+  console.log(req.body);
+
+  var respContent = {  // TODO try to make it a module, error as well
+    payload : null,
+    isSuccess : true,
+    error : null
+  };
+  try {
+
+    var ownerIdGuard = vldUtil.createGuard(
+      configProc.ownerIdExists
+      , "ownerId exists"
+      , "ownerId does not exist"
+      , req.body.ownerId);
+    var depoIdGuard = vldUtil.createGuard(
+      configProc.ownerHasTheDepo
+      , "owner have this depo"
+      , "owner does not have this depo"
+      , req.body.ownerId
+      , req.body.depoId);
+    var mngAccIdGuard = vldUtil.createGuard(
+      configProc.ownerHasTheMngAcc
+      , "owner have this mngAcc"
+      , "owner does not have this mngAcc"
+      , req.body.ownerId
+      , req.body.mngAccId);
+    var checkResult = await vldUtil.asyncGuardsCheck([
+      ownerIdGuard,
+      depoIdGuard,
+      mngAccIdGuard
+    ]);
+
+    if(checkResult.allValidated) {
+      respContent.payload = await configProc.delInitCombo(req.body.ownerId, req.body.depoId, req.body.mngAccId);
     }else{
       respContent.payload = checkResult.allGuards.filter(function(guard) {
         return !guard.isValid;

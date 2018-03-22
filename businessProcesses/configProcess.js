@@ -163,9 +163,42 @@ exports.initDepoMngAcc = async function(ownerId, depoId, mngAccId, initAmount) {
       mngAccId
     );
     await datastoreSvc.deleteInitRecord(ownerId, depoId, mngAccId); // only keep one init record for a depo-mngAcc combination
+    // TODO need rollback logic here, in case the deletion above succeded but insertion below failed
     operSuccess = await datastoreSvc.insertIncomeRecord(initRecord);
   } catch(err) {
     console.log(err + " <-- happened, configProcess consumed the error and returned default value");
   }
   return operSuccess;
+}
+
+exports.delInitCombo = async function(ownerId, depoId, mngAccId) {
+  var operSuccess = false;
+  try {
+    operSuccess = await datastoreSvc.deleteInitRecord(ownerId, depoId, mngAccId);
+  } catch(err) {
+    console.log(err + " <-- happened, configProcess.delInitCombo consumed the error and returned default value");
+  }
+  return operSuccess;
+}
+
+exports.depoIsNotInUse = async function(ownerId, depoId) {
+  var isNotInUse = false;
+  try {
+    var initRecords = await datastoreSvc.queryInitIncomeRecord(ownerId);
+    isNotInUse = initRecords.filter((record) => { return record.depo == depoId }).length == 0;
+  } catch(err) {
+    console.log(err + " <-- happened, configProcess.depoIsNotInUse consumed the error and returned default value");
+  }
+  return isNotInUse;
+}
+
+exports.mngAccIsNotInUse = async function(ownerId, mngAccId) {
+  var isNotInUse = false;
+  try {
+    var initRecords = await datastoreSvc.queryInitIncomeRecord(ownerId);
+    isNotInUse = initRecords.filter((record) => { return record.mngAcc == mngAccId }).length == 0;
+  } catch(err) {
+    console.log(err + " <-- happened, configProcess.depoIsNotInUse consumed the error and returned default value");
+  }
+  return isNotInUse;
 }

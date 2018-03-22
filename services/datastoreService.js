@@ -202,15 +202,21 @@ exports.queryDepoMngAccWithInitValue = async function(ownerId) {
   });
 }
 
+// FIXME this does not guarantee the query result is of type mngAcc
 exports.queryDepoById = async function(depoId) {
   return new Promise((resolve, reject) => {
     bucket.get(
       depoId,
       (err, res) => {
         if (!err) {
-          console.log("Query depo successfully. Depo is");
-          console.log(res.value);
-          resolve(res.value);
+          // FIXME temporary hotfix
+          if(res.value.type != "depo") {
+            reject("query id supplied is not the id of a depo");
+          }else{
+            console.log("Query depo successfully. Depo is");
+            console.log(res.value);
+            resolve(res.value);
+          }
         } else {
           if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
             resolve(null);
@@ -301,15 +307,21 @@ exports.createMngAcc = async function(mngAcc) {
   });
 }
 
+// FIXME this does not guarantee the query result is of type mngAcc
 exports.queryMngAccById = async function(mngAccId) {
   return new Promise((resolve, reject) => {
     bucket.get(
       mngAccId,
       (err, res) => {
         if (!err) {
-          console.log("Query mngAcc successfully. mngAcc is");
-          console.log(res.value);
-          resolve(res.value);
+          // FIXME temporary hotfix
+          if(res.value.type != "mngAcc") {
+            reject("query id supplied is not the id of a mngAcc");
+          }else{
+            console.log("Query mngAcc successfully. mngAcc is");
+            console.log(res.value);
+            resolve(res.value);
+          }
         } else {
           if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
             resolve(null);

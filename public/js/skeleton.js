@@ -104,60 +104,6 @@ define(function() {
     functionContainer.appendChild(contentNode);
   }
 
-  // Convenience method for simple nextAction which only returns a boolean;
-  // usually for these server operations: create, update, delete
-  async function nextActionCUDWrapper(nextAction, paramArrForNextAction, refreshAction) {
-    showLoadingSpinner();
-    let isSuccess = false;
-    try {
-
-      let result = await nextAction.apply(null, paramArrForNextAction);
-      hideLoadingSpinner();
-
-      if(Array.isArray(result.payload)) {
-        let modalHeaderNode = document.createElement("span");
-        modalHeaderNode.textContent = "Warning";
-        let modalContentNode = document.createElement("p");
-        modalContentNode.textContent = "Either you're testing the application, or someone is doing some tricky thing with your browser";
-        let backendValidErrList = document.createElement("ul");
-        result.payload.forEach((validErr) => {
-          let item = document.createElement("li");
-          item.textContent = validErr;
-          backendValidErrList.appendChild(item);
-        });
-        modalContentNode.appendChild(backendValidErrList);
-        configureModal(
-          modalHeaderNode
-          , modalContentNode
-          , null
-          , null
-        );
-      }else if(!result.isSuccess) {
-        console.log(result.error);
-        throw new Error("Backend Error");
-      }else{
-        isSuccess = true;
-        await flashSuccessHint();
-        loadFunctionContent(await refreshAction());
-      }
-
-    } catch(error) {
-      hideLoadingSpinner();
-      console.log(error);
-      let modalHeaderNode = document.createElement("span");
-      modalHeaderNode.textContent = "Oops...";
-      let modalContentNode = document.createElement("p");
-      modalContentNode.textContent = "Please notify system admin with this message: " + error + " ... at " + new Date().toISOString();
-      configureModal(
-        modalHeaderNode
-        , modalContentNode
-        , null
-        , null
-      );
-    };
-    return isSuccess;
-  }
-
   document.getElementById("sideNavOpenBtn").addEventListener("click", openSideNav);
   document.getElementById("sideNavCloseBtn").addEventListener("click", closeSideNav);
 
@@ -184,7 +130,6 @@ define(function() {
     closeModal: closeModal,
     showLoadingSpinner: showLoadingSpinner,
     hideLoadingSpinner: hideLoadingSpinner,
-    flashSuccessHint: flashSuccessHint,
-    nextActionCUDWrapper: nextActionCUDWrapper
+    flashSuccessHint: flashSuccessHint
   };
 });

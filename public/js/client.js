@@ -5,7 +5,11 @@ require.config({
   }
 });
 
-require(["skeleton", "function/expense", "function/income", "function/configuration"], function(skeletonMod, expenseMod, incomeMod, configMod) {
+require(["skeleton", "function/expense", "function/income", "function/configuration", "function/transfer"], function(skeletonMod, expenseMod, incomeMod, configMod, transferMod) {
+
+  // TODO
+  // 1. authentication here
+  // 2. register cookie expiration checking function on skeleton
 
   /**
   * Initialize side nav:
@@ -15,11 +19,12 @@ require(["skeleton", "function/expense", "function/income", "function/configurat
   skeletonMod.registerNavFunction(expenseMod);
   skeletonMod.registerNavFunction(incomeMod);
   skeletonMod.registerNavFunction(configMod);
+  skeletonMod.registerNavFunction(transferMod);
 
   /**
   * Initialize default function content
   */
   // expenseMod.initialize();
-  configMod.initialize();
+  transferMod.initialize();
 
 });

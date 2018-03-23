@@ -66,9 +66,9 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
     try {
       let res = await clientUtil.ajaxPost("/config/currentDepoMngAcc", {	ownerId: "trista167@gmail.com"});
       if(res.isSuccess) {
-        serverData.depos = res.payload.depos;
-        serverData.mngAccs = res.payload.mngAccs;
-        serverData.initializedCombo = res.payload.initialized;
+        serverData.depos = res.payload.depos.sort(function(prev, next) { return prev.displayName.localeCompare(next.displayName); });
+        serverData.mngAccs = res.payload.mngAccs.sort(function(prev, next) { return prev.displayName.localeCompare(next.displayName); });
+        serverData.initializedCombo = res.payload.initialized.sort(function(prev, next) { return prev.depoId.localeCompare(next.depoId); });
       }else{
         console.log(res.error);
       };

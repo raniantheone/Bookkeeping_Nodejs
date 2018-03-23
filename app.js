@@ -13,16 +13,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-app.use("/bookkeeping", function(req, res, next) {
-  let cookie = req.cookies.testAuth;
-  console.log("hit authen check, cookie content: " + cookie);
-  if(cookie) {
-    next();
-  }else{
-    res.cookie("testAuth", "checked");
-    next();
-  }
-});
+// app.use("/bookkeeping", function(req, res, next) {
+//   let cookie = req.cookies.testAuth;
+//   console.log("hit authen check, cookie content: " + cookie);
+//   if(cookie) {
+//     next();
+//   }else{
+//     res.cookie("testAuth", "checked");
+//     next();
+//   }
+// });
 
 app.use("/bookkeeping", express.static(path.join(__dirname, 'public')));
 

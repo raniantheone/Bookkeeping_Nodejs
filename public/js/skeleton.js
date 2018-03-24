@@ -61,6 +61,91 @@ define(function() {
     });
   }
 
+  function serverActionWrapper(validators, promptNextModalConfig) {
+
+    let state = null;
+
+    async function proceedNext() {
+      switch(state) {
+        case "validationPassed" :
+          promptDoubleConfirmation();
+          break;
+        case "validationFailed" :
+          promptValidationFailed();
+          break;
+        case "actionFulfilled" :
+          await hintSuccess();
+          break;
+        case "actionFailed" :
+          promptActionFailure();
+          break;
+      };
+    };
+
+    // -- passed validation: Modal 1
+    function promptDoubleConfirmation() {
+      configureModal(
+        promptNextModalConfig.modalHeaderNode,
+        promptNextModalConfig.modalContentNode,
+        async function() {
+          showLoadingSpinner();
+          let isSuccess = await promptNextModalConfig.nextActionHandler();
+          hideLoadingSpinner();
+          state = isSuccess ? "actionFulfilled" : "actionFailed";
+          await proceedNext();
+          return isSuccess;
+        },
+        null
+      );
+      openModal();
+    };
+
+    // ---- server action fulfilled: Modal 1.1
+    async function hintSuccess() {
+      await flashSuccessHint();
+    };
+
+    // ---- server action failed: Modal 1.2
+    function promptActionFailure() {
+      let modalHeaderNode = document.createElement("p");
+      let modalContentNode = document.createElement("p");
+      modalHeaderNode.textContent = "Heads Up!";
+      modalContentNode.textContent = "Please open your browser console and take a screen capture for system admin.";
+      configureModal(
+        modalHeaderNode,
+        modalContentNode,
+        null,
+        null
+      );
+      openModal();
+    };
+
+    // -- failed validation: Modal 2
+    function promptValidationFailed() {
+      let modalHeaderNode = document.createElement("p");
+      let modalContentNode = document.createElement("ul");
+      modalHeaderNode.textContent = "Oops...";
+      modalContentNode.textContent = "Please follow the advice below:";
+      validationRes.errArr.forEach((errValidator) => {
+        let errItem = document.createElement("li");
+        errItem.textContent = errValidator.errMsg;
+        modalContentNode.appendChild(errItem);
+      });
+      configureModal(
+        modalHeaderNode,
+        modalContentNode,
+        null,
+        null
+      );
+      openModal();
+    };
+
+    let validationRes = validators ? clientUtil.validateAll(validators) : { allPassed: true };
+    state = validationRes.allPassed ? "validationPassed" : "validationFailed";
+    proceedNext();
+
+  }
+
   function configureModal(modalHeaderNode, modalContentNode, nextActionHandler, abortHandler) {
 
     modalHeader.innerHTML = "";
@@ -130,6 +215,7 @@ define(function() {
     closeModal: closeModal,
     showLoadingSpinner: showLoadingSpinner,
     hideLoadingSpinner: hideLoadingSpinner,
-    flashSuccessHint: flashSuccessHint
+    flashSuccessHint: flashSuccessHint,
+    serverActionWrapper: serverActionWrapper
   };
 });

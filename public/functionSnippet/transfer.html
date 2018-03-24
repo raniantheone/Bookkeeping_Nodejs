@@ -1,7 +1,7 @@
 <div class="w3-container w3-margin-top w3-margin-bottom" id="funcConfiguration">
 
 <div id="sourceArea">
-<div class="w3-button w3-block w3-red w3-row" id="sourceCombo">
+<div class="w3-button w3-block w3-blue w3-row" id="sourceCombo">
   <div class="w3-col s11 m11 l11 w3-left-align">From</div>
   <div class="w3-col s1 m1 l1 w3-left-right" name="togglePickList">&#9661;</div>
 </div>
@@ -17,7 +17,7 @@
 </div>
 
 <div id="targetArea">
-<div class="w3-button w3-block w3-red w3-row" id="targetCombo">
+<div class="w3-button w3-block w3-blue w3-row" id="targetCombo">
   <div class="w3-col s11 m11 l11 w3-left-align">To</div>
   <div class="w3-col s1 m1 l1 w3-left-right" name="togglePickList">&#9661;</div>
 </div>
@@ -32,10 +32,21 @@
 </div>
 </div>
 
+<div id="transferArea">
+  <div class="w3-bar w3-block w3-blue w3-padding w3-left-align" id="amountLable">
+    Amount
+  </div>
+  <div class="w3-panel w3-light-grey w3-row" id="amountPickHint">
+    Please pick source and target
+  </div>
+  <div>
+    <input class="w3-input w3-light-grey w3-xlarge w3-margin-bottom" type="number" id="transAmount">
+    <a href="#" class="w3-button w3-block w3-blue w3-margin-top w3-margin-bottom" id="transOKBtn">OK</a>
+  </div>
+</div>
 
-
-<table class="w3-table w3-bordered" id="pickList" style="display:none">
-<tr class="w3-row" id="listRowTmpl">
+<table class="w3-table w3-bordered w3-block" id="pickList" style="display:none">
+<tr class="w3-row w3-block" id="listRowTmpl">
   <td class="w3-col s11 m11 l11">
     <div name="depoDisplayName" data-depoId="">depo name</div>
     <div name="mngAccDisplayName" data-mngAccId="">mngAcc name</div>

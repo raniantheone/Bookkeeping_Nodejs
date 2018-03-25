@@ -1,0 +1,37 @@
+<div class="w3-container w3-margin-top w3-margin-bottom" id="funcDistribution">
+
+  <div class="w3-panel w3-light-grey">
+    <h3>Current Assets: <span id="assestsTotal">9999</span></h3>
+  </div>
+
+  <button class="w3-button w3-block w3-blue w3-left-align" id="byDepoToggle">By Despository</button>
+  <div id="distroAreaByDepo">
+    SVG Here
+    <button class="w3-button w3-block w3-light-grey w3-left-align" id="depoSubRow_templ" style="border-left-style:solid; border-left-width:6px">
+      <span name="depoSubName">DepoName</span>:
+      <span name="depoSubSumAmount">total amount</span>
+    </button>
+    <ul id="depoSubRowItemsList_templ" style="display:none">
+      <li id="mngAccItemRow_tmpl">
+        <span name="mngAccItemName">Managing Account</span>:
+        <span name="mngAccItemAmount">amount</span>
+      </li>
+    </ul>
+  </div>
+
+  <button class="w3-button w3-block w3-blue w3-left-align" id="byMngAccToggle">By Managing Account</button>
+  <div id="distroAreaByMngAcc">
+    SVG Here
+    <button class="w3-button w3-block w3-light-grey w3-left-align" id="mngAccSubRow_templ" style="border-left-style:solid; border-left-width:6px">
+      <span name="mngAccSubName">MngAccName</span>:
+      <span name="mngAccSubSumAmount">total amount</span>
+    </button>
+    <ul id="mngAccSubRowItemsList_templ" style="display:none">
+      <li id="depoItemRow_tmpl">
+        <span name="depoItemName">Depo</span>:
+        <span name="depoItemAmount">amount</span>
+      </li>
+    </ul>
+  </div>
+
+</div>

@@ -5,7 +5,7 @@ require.config({
   }
 });
 
-require(["skeleton", "function/expense", "function/income", "function/configuration", "function/transfer"], function(skeletonMod, expenseMod, incomeMod, configMod, transferMod) {
+require(["skeleton", "function/expense", "function/income", "function/configuration", "function/transfer", "function/distribution"], function(skeletonMod, expenseMod, incomeMod, configMod, transferMod, distroMod) {
 
   // TODO
   // 1. authentication here
@@ -20,11 +20,12 @@ require(["skeleton", "function/expense", "function/income", "function/configurat
   skeletonMod.registerNavFunction(incomeMod);
   skeletonMod.registerNavFunction(configMod);
   skeletonMod.registerNavFunction(transferMod);
+  skeletonMod.registerNavFunction(distroMod);
 
   /**
   * Initialize default function content
   */
   // expenseMod.initialize();
-  transferMod.initialize();
+  distroMod.initialize();
 
 });

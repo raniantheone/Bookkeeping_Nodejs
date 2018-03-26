@@ -575,3 +575,46 @@ exports.queryFlowRecordByOwnerId = async function(ownerId) {
     );
   });
 }
+
+exports.insertAccessData = async function(accessData) {
+  return new Promise((resolve, reject) => {
+    bucket.insert(
+      accessData.token.toString(),
+      accessData,
+      { expiry: accessData.maxAge },
+      (err, res) => {
+        if (!err) {
+          console.log("stored document successfully. CAS is %j", res.cas);
+          resolve(true);
+        } else {
+          console.error("Couldn't store document: %j", err);
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+exports.queryAccessData = async function(accessToken) {
+  console.log(accessToken);
+  return new Promise((resolve, reject) => {
+    bucket.getAndTouch(
+      accessToken.toString(),
+      120,
+      (err, res) => {
+        if (!err) {
+          console.log("Query access data successfully. Data is");
+          console.log(res.value);
+          resolve(res.value);
+        } else {
+          if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
+            resolve(null);
+            return;
+          }
+          console.error("Couldn't query existing user: %j", err);
+          reject(err);
+        }
+      }
+    );
+  });
+};

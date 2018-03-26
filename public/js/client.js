@@ -6,11 +6,15 @@ require.config({
   }
 });
 
-require(["skeleton", "function/expense", "function/income", "function/configuration", "function/transfer", "function/distribution"], function(skeletonMod, expenseMod, incomeMod, configMod, transferMod, distroMod) {
+require(["skeleton", "function/expense", "function/income", "function/configuration", "function/transfer", "function/distribution", "function/authentication"], function(skeletonMod, expenseMod, incomeMod, configMod, transferMod, distroMod, authenMod) {
 
   // TODO
   // 1. authentication here
   // 2. register cookie expiration checking function on skeleton
+  window.onerror = function (message, file, line, col, error) {
+    alert("Error occurred: " + error.message);
+    return false;
+  };
 
   /**
   * Initialize side nav:
@@ -27,6 +31,6 @@ require(["skeleton", "function/expense", "function/income", "function/configurat
   * Initialize default function content
   */
   // expenseMod.initialize();
-  distroMod.initialize();
+  authenMod.initialize();
 
 });

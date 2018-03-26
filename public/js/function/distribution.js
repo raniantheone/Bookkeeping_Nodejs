@@ -1,4 +1,4 @@
-define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution.html"], function(clientUtil, skeletonMod, distributionHtml) {
+define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution.html", "d3"], function(clientUtil, skeletonMod, distributionHtml, d3) {
 
   let displayName = "test distribution client mod";
 
@@ -67,7 +67,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     return name;
   };
 
-  function buildDepoDistro(depoId, displayName, balance, mngAccs) {
+  function buildDepoDistro(depoId, displayName, balance, mngAccs, circleResArr) {
     let depoDistro = {
       id: depoId,
       name: displayName,
@@ -80,6 +80,11 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     depoDistro.depoNodeRepresentation.setAttribute("id", "depoSubRow_" + depoDistro.id);
     depoDistro.depoNodeRepresentation.querySelector("[name=depoSubName]").textContent = depoDistro.name;
     depoDistro.depoNodeRepresentation.querySelector("[name=depoSubSumAmount]").textContent = depoDistro.subSum;
+    depoDistro.depoNodeRepresentation.style.borderLeftColor = circleResArr.filter((circleRes) => {
+      return circleRes.id == depoDistro.id;
+    }).map((matchedRes) => {
+      return matchedRes.color;
+    })[0];
     depoDistro.listNodeRepresentation = distroUi.depoSubRowItemsList_templ.cloneNode();
     depoDistro.listNodeRepresentation.setAttribute("id", "depoSubRowItemsList_" + depoDistro.id);
     depoDistro.subMngAccs.forEach((mngAcc) => {
@@ -95,7 +100,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     return depoDistro;
   };
 
-  function buildMngAccDistro(mngAccId, displayName, balance, depos) {
+  function buildMngAccDistro(mngAccId, displayName, balance, depos, circleResArr) {
     let mngAccDistro = {
       id: mngAccId,
       name: displayName,
@@ -108,6 +113,11 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     mngAccDistro.mngAccNodeRepresentation.setAttribute("id", "mngAccSubRow_" + mngAccDistro.id);
     mngAccDistro.mngAccNodeRepresentation.querySelector("[name=mngAccSubName]").textContent = mngAccDistro.name;
     mngAccDistro.mngAccNodeRepresentation.querySelector("[name=mngAccSubSumAmount]").textContent = mngAccDistro.subSum;
+    mngAccDistro.mngAccNodeRepresentation.style.borderLeftColor = circleResArr.filter((circleRes) => {
+      return circleRes.id == mngAccDistro.id;
+    }).map((matchedRes) => {
+      return matchedRes.color;
+    })[0];
     mngAccDistro.listNodeRepresentation = distroUi.mngAccSubRowItemsList_templ.cloneNode();
     mngAccDistro.listNodeRepresentation.setAttribute("id", "mngAccSubRowItemsList_" + mngAccDistro.id);
     mngAccDistro.subdepos.forEach((depo) => {
@@ -122,6 +132,68 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     });
     return mngAccDistro;
   };
+
+  function drawDepoDistroChart(data) {
+
+    let circleResArr = drawPieChart(data, "distroPieChartByDepo");
+    let hiddenGraph = document.getElementById("distroPieChartByDepo");
+    distroUi.distroAreaByDepo.appendChild(hiddenGraph);
+    distroUi.distroAreaByDepo.querySelector("#distroPieChartByDepo").style.display = "block";
+    return circleResArr;
+
+  };
+
+  function drawMngAccDistroChart(data) {
+
+    let circleResArr = drawPieChart(data, "distroPieChartByMngAcc");
+    let hiddenGraph = document.getElementById("distroPieChartByMngAcc");
+    distroUi.distroAreaByMngAcc.appendChild(hiddenGraph);
+    distroUi.distroAreaByMngAcc.querySelector("#distroPieChartByMngAcc").style.display = "block";
+    return circleResArr;
+
+  };
+
+  function drawPieChart(data, chartId) {
+
+    var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    var color = d3.scaleOrdinal(d3.schemeAccent);
+
+    var r = 50;
+    var arc = d3.arc().outerRadius(r).innerRadius(r * 0.6);
+    var pie = d3.pie()
+    .sort(null)
+    .value(function(d) { return d.subSum; });
+
+    let circleResArr = [];
+    var svg = d3.select("body")
+        .append("svg")
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+          .attr("style", "display:none; margin:auto; margin-top:15px; margin-bottom:10px")
+          .attr("id", chartId)
+        .append("g")
+        .attr("transform", "translate(" + r + "," + r + ")")
+        .data(data)
+          .attr("class", "pie")
+        .selectAll(".arc")
+        .data(pie(data))
+          .enter().append("path")
+            .attr("class", "arc")
+            .attr("d", arc)
+            .style("fill", function(d) {
+              let circleRes = {
+                id: d.data.id,
+                name: d.data.name,
+                color: color(d.data.name)
+              };
+              circleResArr.push(circleRes);
+              return circleRes.color;
+            });
+
+    console.log(circleResArr);
+    return circleResArr;
+  };
+
 
   async function getInitializedContentNode(mode) {
     refreshdistroUi();
@@ -181,20 +253,43 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     });
 
     distroUi.distroAreaByDepo.innerHTML = "";
+    distroUi.distroAreaByMngAcc.innerHTML = "";
+    let depoCircleResArr = drawDepoDistroChart(depoDistroDatas);
+    let mngAccCircleResArr = drawMngAccDistroChart(mngAccDistroDatas);
+
     depoDistroDatas.forEach((depoDistroData) => {
-      let depoDistro = buildDepoDistro(depoDistroData.id, depoDistroData.name, depoDistroData.subSum, depoDistroData.subMngAccs);
+      let depoDistro = buildDepoDistro(depoDistroData.id, depoDistroData.name, depoDistroData.subSum, depoDistroData.subMngAccs, depoCircleResArr);
       distroUi.distroAreaByDepo.appendChild(depoDistro.depoNodeRepresentation);
       distroUi.distroAreaByDepo.appendChild(depoDistro.listNodeRepresentation);
     });
 
-    distroUi.distroAreaByMngAcc.innerHTML = "";
     mngAccDistroDatas.forEach((mngAccDistroData) => {
-      let mngAccDistro = buildMngAccDistro(mngAccDistroData.id, mngAccDistroData.name, mngAccDistroData.subSum, mngAccDistroData.subDepos);
+      let mngAccDistro = buildMngAccDistro(mngAccDistroData.id, mngAccDistroData.name, mngAccDistroData.subSum, mngAccDistroData.subDepos, mngAccCircleResArr);
       distroUi.distroAreaByMngAcc.appendChild(mngAccDistro.mngAccNodeRepresentation);
       distroUi.distroAreaByMngAcc.appendChild(mngAccDistro.listNodeRepresentation);
     });
 
+    function showOnlyOneDistro(eventTarget) {
+      if(eventTarget.getAttribute("id") == "byDepoToggle") {
+        distroUi.distroAreaByDepo.style.display = "block";
+        distroUi.distroAreaByMngAcc.style.display = "none";
+      }else if(eventTarget.getAttribute("id") == "byMngAccToggle") {
+        distroUi.distroAreaByDepo.style.display = "none";
+        distroUi.distroAreaByMngAcc.style.display = "block";
+      }
+    };
 
+    distroUi.byDepoToggle.addEventListener("click", function() {
+      showOnlyOneDistro(this);
+    });
+
+    distroUi.byMngAccToggle.addEventListener("click", function() {
+      showOnlyOneDistro(this);
+    });
+
+    distroUi.assestsTotal.textContent = serverData.balanceEntries.reduce((accumulator ,entry) => {
+      return accumulator += entry.currentBalance;
+    }, 0);
 
     return distroUi.contentNode;
   };

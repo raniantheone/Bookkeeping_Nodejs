@@ -1,7 +1,8 @@
 require.config({
   baseUrl: "js",
   paths: {
-    text :"./lib/text"
+    text: "./lib/text",
+    d3: "./lib/d3"
   }
 });
 

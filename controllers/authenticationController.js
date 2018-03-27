@@ -2,19 +2,22 @@ var authenProc = require("../businessProcesses/authenticationProcess");
 var vldUtil = require("../utils/validation");
 
 // check if the request is from a valid user, return only when check failed, otherwise pass req to next controller
-exports.authenticationGuard = function(req, res, next) {
+exports.authenticationGuard = async function(req, res, next) {
   let cookies = req.cookies;
   let respContent = {
     authenError: null
   };
   console.log(cookies);
-  // if(Object.keys(cookies).length == 0) {
-  //   respContent.authenError = "Empty auth cookie";
-  //   res.json(respContent);
-  //   return;
-  // }
-  next();
-}
+  if(Object.keys(cookies).length > 0 && cookies.accessToken && cookies.user) {
+    let isValid = await authenProc.checkAccessData(cookies.accessToken, cookies.user);
+    if(isValid) {
+      next();
+      return;
+    }
+  };
+  respContent.authenError = "Auth cookie is not valid";
+  res.json(respContent);
+};
 
 exports.login = async function(req, res) {
 
@@ -53,12 +56,9 @@ exports.login = async function(req, res) {
         let accessData = await authenProc.buildAccessData(req.body.ownerId, req.body.password);
         res.cookie("accessToken", accessData.token, { maxAge: 120000 }); // TODO test temp const
         res.cookie("user", req.body.ownerId, { maxAge: 120000 }); // TODO test temp const
-        res.redirect("/bookkeeping/client.html");
-        return;
+        respContent.payload = true;
       }else{
         respContent.payload = "credential incorrect";
-        res.json(respContent);
-        return;
       }
     }else{
       respContent.payload = checkResult.allGuards.filter(function(guard) {

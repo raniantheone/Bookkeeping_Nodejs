@@ -3,39 +3,29 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
   let displayName = "test authentication client mod";
 
   let authenUi = {
-    contentNode: null
+    contentNode: null,
+    userAcc: null,
+    userPwd: null,
+    keepExpenseOKBtn: null
   };
 
-  let serverData = {
-  };
-
-  function refreshauthenUi() {
+  function refreshAuthenUi() {
     authenUi.contentNode = new DOMParser().parseFromString(authenHtml, "text/html").getElementById("funcAuthentication");
-
+    authenUi.userAcc = authenUi.contentNode.querySelector("#userAcc");
+    authenUi.userPwd = authenUi.contentNode.querySelector("#userPwd");
+    authenUi.keepExpenseOKBtn = authenUi.contentNode.querySelector("#keepExpenseOKBtn");
   }
 
-  async function refreshServerData() {
-    try {
-      let res = await clientUtil.ajaxPost("xxx", "xxx");
-      if(res.isSuccess) {
-
-      }else{
-        console.log(res.error);
-      };
-    } catch(err) {
-      console.log(err);
-    };
-  };
-
   // TODO should be refactored into some common module function
-  function serverActionWrapper(validators, promptNextModalConfig) {
+  // This one does not prompt double confirm before executing server action
+  async function loginActionWrapper(validators, serverAction) {
 
     let state = null;
 
     async function proceedNext() {
       switch(state) {
         case "validationPassed" :
-          promptDoubleConfirmation();
+          await execServerAction(serverAction);
           break;
         case "validationFailed" :
           promptValidationFailed();
@@ -50,26 +40,20 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
     };
 
     // -- passed validation: Modal 1
-    function promptDoubleConfirmation() {
-      skeletonMod.configureModal(
-        promptNextModalConfig.modalHeaderNode,
-        promptNextModalConfig.modalContentNode,
-        async function() {
-          skeletonMod.showLoadingSpinner();
-          let isSuccess = await promptNextModalConfig.nextActionHandler();
-          skeletonMod.hideLoadingSpinner();
-          state = isSuccess ? "actionFulfilled" : "actionFailed";
-          await proceedNext();
-          return isSuccess;
-        },
-        null
-      );
-      skeletonMod.openModal();
+    async function execServerAction(serverAction) {
+
+      skeletonMod.showLoadingSpinner();
+      let isSuccess = await serverAction();
+      skeletonMod.hideLoadingSpinner();
+      state = isSuccess ? "actionFulfilled" : "actionFailed";
+      proceedNext();
+
     };
 
     // ---- server action fulfilled: Modal 1.1
     async function hintSuccess() {
       await skeletonMod.flashSuccessHint();
+      window.location.replace("/bookkeeping/client.html");
     };
 
     // ---- server action failed: Modal 1.2
@@ -113,7 +97,9 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
 
   }
 
-
+  async function login(payload) {
+    return await commonCUDActionWrapper("/auth/login", payload);
+  }
 
   // CUD stands for these server actions: Create, Update, Delete
   async function commonCUDActionWrapper(url, payload) {
@@ -137,18 +123,38 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
   };
 
 
-  async function getInitializedContentNode(mode) {
+  function getInitializedContentNode(mode) {
 
-    refreshauthenUi();
-    // await refreshServerData();
-
+    refreshAuthenUi();
+    authenUi.keepExpenseOKBtn.addEventListener("click", function() {
+      let payload = {
+        ownerId: authenUi.userAcc.value,
+        password: authenUi.userPwd.value
+      };
+      let userAccValidator = clientUtil.createValidator(
+        authenUi.userAcc,
+        (userAccVal) => {
+          return userAccVal != undefined && userAccVal != null && userAccVal.length > 0;
+        },
+        "Please provide user account"
+      );
+      let userPwdValidator = clientUtil.createValidator(
+        authenUi.userPwd,
+        (userPwdVal) => {
+          return userPwdVal != undefined && userPwdVal != null && userPwdVal.length > 0;
+        },
+        "Please provide user password"
+      );
+      loginActionWrapper([userAccValidator, userPwdValidator], async function() { return await login(payload); });
+    });
 
     return authenUi.contentNode;
+
   };
 
   return {
-    initialize: async function() {
-      skeletonMod.loadFunctionContent(await getInitializedContentNode());
+    initialize: function() {
+      skeletonMod.loadFunctionContent(getInitializedContentNode());
       skeletonMod.loadFunctionHeader(displayName);
     },
     getDisplayName: function() {

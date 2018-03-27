@@ -27,7 +27,12 @@ define(function() {
         xhr.onload = function() {
           if(xhr.status === 200) {
             console.log(xhr.responseText);
-            resolve(JSON.parse(xhr.responseText));
+            if(xhr.responseText.includes("Auth cookie is not valid")) {
+              window.location.replace("/bookkeeping/client.html");
+              reject("Auth cookie is not valid");
+            }else{
+              resolve(JSON.parse(xhr.responseText));
+            }
           }else{
             reject(xhr.status);
           }

@@ -64,14 +64,9 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/income.html"
     console.log(payload);
     let isSuccess = false;
     try {
-      // for ui test
-      // await new Promise((resolve, reject) => {
-      //   setTimeout(() => { console.log("test waiting"); resolve(); }, 1000);
-      // });
       let operResult = await clientUtil.ajaxPost("/flow/income/keepRecord", payload);
       skeletonMod.hideLoadingSpinner();
 
-      // TODO flash success or show error notification
       if(Array.isArray(operResult.payload)) {
         let modalHeaderNode = document.createElement("span");
         modalHeaderNode.textContent = "Warning";

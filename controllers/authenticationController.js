@@ -1,13 +1,16 @@
+var cls = require('cls-hooked');
 var authenProc = require("../businessProcesses/authenticationProcess");
 var vldUtil = require("../utils/validation");
+var logUtil = require("../utils/customLogger");
+var logger = logUtil.logger;
 
 // check if the request is from a valid user, return only when check failed, otherwise pass req to next controller
 exports.authenticationGuard = async function(req, res, next) {
+  logger.info("controller authenticationGuard invoked");
   let cookies = req.cookies;
   let respContent = {
     authenError: null
   };
-  console.log(cookies);
   if(Object.keys(cookies).length > 0 && cookies.accessToken && cookies.user) {
     let isValid = await authenProc.checkAccessData(cookies.accessToken, cookies.user);
     if(isValid) {
@@ -21,9 +24,6 @@ exports.authenticationGuard = async function(req, res, next) {
 
 exports.login = async function(req, res) {
 
-  console.log("login invoked");
-  console.log(req.body);
-
   var respContent = {  // TODO try to make it a module, error as well
     payload : null,
     isSuccess : true,
@@ -31,6 +31,9 @@ exports.login = async function(req, res) {
   };
 
   try {
+
+    logger.info("controller login invoked");
+    console.log(cls.getNamespace("testReqScope"));
 
     // TODO email format, length, special character validation
     var ownerIdGuard = vldUtil.createGuard(
@@ -51,9 +54,11 @@ exports.login = async function(req, res) {
     ]);
 
     if(checkResult.allValidated) {
-      let isValid = await authenProc.isValidUser(req.body.ownerId, req.body.password);
+      let ownerId = req.body.ownerId;
+      let password = req.body.password;
+      let isValid = await authenProc.isValidUser(ownerId, password);
       if(isValid) {
-        let accessData = await authenProc.buildAccessData(req.body.ownerId, req.body.password);
+        let accessData = await authenProc.buildAccessData(ownerId, password);
         res.cookie("accessToken", accessData.token, { maxAge: 120000 }); // TODO test temp const
         res.cookie("user", req.body.ownerId, { maxAge: 120000 }); // TODO test temp const
         respContent.payload = true;
@@ -77,11 +82,11 @@ exports.login = async function(req, res) {
 }
 
 exports.checkAuthenStat = async function(req, res) {
+  logger.info("controller checkAuthenStat invoked");
   let cookies = req.cookies;
   let respContent = {
     authenIsValid: false
   };
-  console.log(cookies);
   if(Object.keys(cookies).length != 0) {
     respContent.authenIsValid = await authenProc.checkAccessData(cookies.accessToken, cookies.user);
   };

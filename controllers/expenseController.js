@@ -2,13 +2,14 @@
  * This module handles request regarding expense flow.
  * @module expenseController
  */
-
 var expenssProc = require("../businessProcesses/expenseProcess");
 var vldUtil = require("../utils/validation");
+var logUtil = require("../utils/customLogger");
+var logger = logUtil.logger;
 
 exports.getAvailDepoMngAccOptForExpense = async function(req, res) {
 
-  console.log("getAvailDepoMngAccOptForExpense invoked");
+  logger.info("getAvailDepoMngAccOptForExpense invoked");
   console.log(req.body);
 
   var respContent = {  // TODO try to make it a module, error as well

@@ -1,12 +1,9 @@
+var cls = require('cls-hooked');
+var testReqScope = cls.createNamespace("testReqScope");
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
 var cookieParser = require('cookie-parser')
-var flowRouter = require("./routes/flow");
-var configRouter = require("./routes/config");
-var analysisRouter = require("./routes/analysis");
-var authenRouter = require("./routes/authentication");
-var authenController = require("./controllers/authenticationController");
 var app = express();
 
 app.use(bodyParser.json());
@@ -16,6 +13,24 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/bookkeeping", express.static(path.join(__dirname, 'public')));
+
+app.use("/", function(req, res, next) {
+  var testReqScope = cls.getNamespace("testReqScope");
+  testReqScope.bindEmitter(req);
+  testReqScope.bindEmitter(res);
+  testReqScope.run(function() {
+    var reqId = Math.random();
+    testReqScope.set("reqId", reqId);
+    console.log("request id %s set for %s", reqId, req.path);
+    next();
+  });
+});
+
+var flowRouter = require("./routes/flow");
+var configRouter = require("./routes/config");
+var analysisRouter = require("./routes/analysis");
+var authenRouter = require("./routes/authentication");
+var authenController = require("./controllers/authenticationController");
 
 app.use("/auth", authenRouter);
 

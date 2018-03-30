@@ -1,9 +1,10 @@
+var cls = require('cls-hooked');
+let logUtil = require("../utils/customLogger");
+let logger = logUtil.logger;
 let couchbase = require('couchbase');
 let cluster = new couchbase.Cluster('couchbase://localhost/');
 cluster.authenticate('Administrator', 'password');
 let bucket = cluster.openBucket('bookkeeping');
-
-let async = require('async');
 
 exports.queryDepoMngAccAndPreselect = async function(ownerId) {
   return new Promise((resolve, reject) => {
@@ -158,25 +159,53 @@ exports.queryAvailableMngAccs = async function(transIssuer) {
 }
 
 exports.queryExistingUser = async function(ownerId) {
-  return new Promise((resolve, reject) => {
+  logger.info("queryExistingUser invoked");
+  return await new Promise((resolve, reject) => {
     bucket.get(
       ownerId + "::user",
       (err, res) => {
         if (!err) {
-          console.log("Query existing user successfully. User is");
-          console.log(res.value);
-          resolve(res.value);
-        } else {
-          if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
-            resolve(null);
-            return;
-          }
-          console.error("Couldn't query existing user: %j", err);
+          resolve(res);
+        }else{
           reject(err);
         }
       }
     );
-  });
+  }).then((res) => {
+    logger.info("Query existing user successfully. User is");
+    logger.info(JSON.stringify(res.value));
+    return res.value;
+  }).catch((err) => {
+    if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
+      console.error("User: %j does not exist", ownerId);
+      resolve(null);
+    }else{
+      console.error("Couldn't query existing user: %j", err);
+      reject(err);
+    };
+  })
+
+  // return new Promise((resolve, reject) => {
+  //   logger.info("queryExistingUser invoked ... in promise process");
+  //   bucket.get(
+  //     ownerId + "::user",
+  //     (err, res) => {
+  //       if (!err) {
+  //         logger.info("Query existing user successfully. User is");
+  //         logger.info(JSON.stringify(res.value));
+  //         resolve(res.value);
+  //       } else {
+  //         if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
+  //           resolve(null);
+  //           return;
+  //         }
+  //         console.error("Couldn't query existing user: %j", err);
+  //         reject(err);
+  //       }
+  //     }
+  //   );
+  // });
+
 }
 
 exports.queryDepoMngAccWithInitValue = async function(ownerId) {

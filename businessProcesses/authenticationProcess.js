@@ -1,12 +1,13 @@
 var cls = require('cls-hooked');
+var logUtil = require("../utils/customLogger");
+var logger = logUtil.logger;
 var datastoreSvc = require("../services/datastoreService");
 var userFactory = require("../businessProcesses/models/user");
 var hashUtil = require("../utils/hash");
-var logUtil = require("../utils/customLogger");
-var logger = logUtil.logger;
+
 
 exports.isValidUser = async function(ownerId, password) {
-  logger.info("isValidUser invoked " + cls.getNamespace("testReqScope").get("reqId"));
+  logger.info("isValidUser invoked");
   console.log(cls.getNamespace("testReqScope"));
   let isValid = false;
   try {

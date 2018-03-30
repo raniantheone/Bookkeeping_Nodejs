@@ -1,8 +1,9 @@
 var cls = require('cls-hooked');
-var authenProc = require("../businessProcesses/authenticationProcess");
-var vldUtil = require("../utils/validation");
 var logUtil = require("../utils/customLogger");
 var logger = logUtil.logger;
+var authenProc = require("../businessProcesses/authenticationProcess");
+var vldUtil = require("../utils/validation");
+
 
 // check if the request is from a valid user, return only when check failed, otherwise pass req to next controller
 exports.authenticationGuard = async function(req, res, next) {

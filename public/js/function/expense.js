@@ -1,6 +1,6 @@
 define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html"], function(clientUtil, skeletonMod, expenseHtml) {
 
-  let displayName = "test expense client mod";
+  let displayName = "Keep Expense";
 
   let expenseUi = {
     contentNode: null,

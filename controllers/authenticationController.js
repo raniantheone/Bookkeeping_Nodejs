@@ -15,7 +15,7 @@ exports.authenticationGuard = async function(req, res, next) {
   if(Object.keys(cookies).length > 0 && cookies.accessToken && cookies.user) {
     let isValid = await authenProc.checkAccessData(cookies.accessToken, cookies.user);
     if(isValid) {
-      next();
+      next(); // TODO refresh client cookie expiration
       return;
     }
   };
@@ -60,8 +60,8 @@ exports.login = async function(req, res) {
       let isValid = await authenProc.isValidUser(ownerId, password);
       if(isValid) {
         let accessData = await authenProc.buildAccessData(ownerId, password);
-        res.cookie("accessToken", accessData.token, { maxAge: 120000 }); // TODO test temp const
-        res.cookie("user", req.body.ownerId, { maxAge: 120000 }); // TODO test temp const
+        res.cookie("accessToken", accessData.token, { maxAge: 300000 }); // TODO test temp const
+        res.cookie("user", req.body.ownerId, { maxAge: 300000 }); // TODO test temp const
         respContent.payload = true;
       }else{
         respContent.payload = "credential incorrect";

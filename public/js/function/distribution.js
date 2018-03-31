@@ -1,6 +1,6 @@
 define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution.html", "d3"], function(clientUtil, skeletonMod, distributionHtml, d3) {
 
-  let displayName = "test distribution client mod";
+  let displayName = "Check Distribution";
 
   let distroUi = {
     contentNode: null,

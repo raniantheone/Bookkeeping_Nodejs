@@ -1,6 +1,6 @@
 define(["../clientUtil", "../skeleton", "text!../../functionSnippet/transfer.html"], function(clientUtil, skeletonMod, transferHtml) {
 
-  let displayName = "test transfer client mod";
+  let displayName = "Transfer Amount";
 
   let transferUi = {
     contentNode: null,

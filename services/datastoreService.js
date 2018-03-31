@@ -629,7 +629,7 @@ exports.queryAccessData = async function(accessToken) {
   return new Promise((resolve, reject) => {
     bucket.getAndTouch(
       accessToken.toString(),
-      120,
+      300,
       (err, res) => {
         if (!err) {
           console.log("Query access data successfully. Data is");

@@ -1,6 +1,6 @@
 define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuration.html"], function(clientUtil, skeletonMod, configHtml) {
 
-  let displayName = "test configuration client mod";
+  let displayName = "Configure";
 
   let configUi = {
     contentNode: null,

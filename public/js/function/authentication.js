@@ -23,25 +23,41 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
     let state = null;
 
     async function proceedNext() {
-      switch(state) {
-        case "validationPassed" :
-          await execServerAction(serverAction);
-          break;
-        case "validationFailed" :
-          promptValidationFailed();
-          break;
-        case "actionFulfilled" :
-          await hintSuccess();
-          break;
-        case "actionFailed" :
-          promptActionFailure();
-          break;
-      };
+      try {
+        switch(state) {
+          case "validationPassed" :
+            await execServerAction(serverAction);
+            break;
+          case "validationFailed" :
+            promptValidationFailed();
+            break;
+          case "actionFulfilled" :
+            await hintSuccess();
+            break;
+          case "actionFailed" :
+            promptActionFailure();
+            break;
+        };
+      } catch(err) {
+        console.log(err);
+        let modalHeaderNode = document.createElement("p");
+        let modalContentNode = document.createElement("p");
+        modalHeaderNode.textContent = "Heads up";
+        modalContentNode.textContent = "Please open your browser console and take a screenshot for system admin";
+        skeletonMod.configureModal(
+          modalHeaderNode,
+          modalContentNode,
+          null,
+          null
+        );
+        skeletonMod.openModal();
+      }
     };
 
     // -- passed validation: Modal 1
     async function execServerAction(serverAction) {
 
+      skeletonMod.openModal();
       skeletonMod.showLoadingSpinner();
       let isSuccess = await serverAction();
       skeletonMod.hideLoadingSpinner();
@@ -53,6 +69,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
     // ---- server action fulfilled: Modal 1.1
     async function hintSuccess() {
       await skeletonMod.flashSuccessHint();
+      skeletonMod.closeModal();
       window.location.replace("/bookkeeping/client.html");
     };
 
@@ -60,8 +77,8 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
     function promptActionFailure() {
       let modalHeaderNode = document.createElement("p");
       let modalContentNode = document.createElement("p");
-      modalHeaderNode.textContent = "Heads Up!";
-      modalContentNode.textContent = "Please open your browser console and take a screen capture for system admin.";
+      modalHeaderNode.textContent = "Oops...";
+      modalContentNode.textContent = "Please double check your login credential";
       skeletonMod.configureModal(
         modalHeaderNode,
         modalContentNode,
@@ -98,14 +115,9 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
   }
 
   async function login(payload) {
-    return await commonCUDActionWrapper("/auth/login", payload);
-  }
-
-  // CUD stands for these server actions: Create, Update, Delete
-  async function commonCUDActionWrapper(url, payload) {
     let isSuccess = false;
     try {
-      let result = await clientUtil.ajaxPost(url, payload);
+      let result = await clientUtil.ajaxPost("/auth/login", payload);
       if(!result.isSuccess) {
         console.log(result.error);
         throw new Error("Backend Error");
@@ -114,18 +126,18 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/authenticati
         console.log(errorContent);
         throw new Error("Client Data Has Been Forged Error");
       }else{
-        isSuccess = true;
+        isSuccess = result.payload;
       }
     } catch(error) {
       console.log(error);
     };
     return isSuccess;
-  };
-
+  }
 
   function getInitializedContentNode(mode) {
 
     refreshAuthenUi();
+    skeletonMod.hideFunctionHeaderBar();
     authenUi.keepExpenseOKBtn.addEventListener("click", function() {
       let payload = {
         ownerId: authenUi.userAcc.value,

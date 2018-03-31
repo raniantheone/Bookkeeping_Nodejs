@@ -8,6 +8,7 @@ define(function() {
   var modalBgBase = document.getElementById("modalBgBase");
   var loadingSpinner = document.getElementById("loadingSpinner");
   var hintSuccess = document.getElementById("hintSuccess");
+  var functionHeaderBar = document.getElementsByClassName("w3-top")[0];
 
   function openSideNav() {
     document.getElementById("sideNav").style.display = "block";
@@ -189,6 +190,14 @@ define(function() {
     functionContainer.appendChild(contentNode);
   }
 
+  function hideFunctionHeaderBar() {
+    functionHeaderBar.style.display = "none";
+  }
+
+  function showFunctionHeaderBar() {
+    functionHeaderBar.style.display = "block";
+  }
+
   document.getElementById("sideNavOpenBtn").addEventListener("click", openSideNav);
   document.getElementById("sideNavCloseBtn").addEventListener("click", closeSideNav);
 
@@ -216,6 +225,8 @@ define(function() {
     showLoadingSpinner: showLoadingSpinner,
     hideLoadingSpinner: hideLoadingSpinner,
     flashSuccessHint: flashSuccessHint,
-    serverActionWrapper: serverActionWrapper
+    serverActionWrapper: serverActionWrapper,
+    hideFunctionHeaderBar: hideFunctionHeaderBar,
+    showFunctionHeaderBar: showFunctionHeaderBar
   };
 });

@@ -178,10 +178,10 @@ exports.queryExistingUser = async function(ownerId) {
   }).catch((err) => {
     if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
       console.error("User: %j does not exist", ownerId);
-      resolve(null);
+      return null;
     }else{
       console.error("Couldn't query existing user: %j", err);
-      reject(err);
+      throw new Error(err);
     };
   })
 

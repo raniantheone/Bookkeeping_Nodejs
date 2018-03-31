@@ -64,7 +64,7 @@ exports.login = async function(req, res) {
         res.cookie("user", req.body.ownerId, { maxAge: 300000 }); // TODO test temp const
         respContent.payload = true;
       }else{
-        respContent.payload = "credential incorrect";
+        respContent.payload = false;
       }
     }else{
       respContent.payload = checkResult.allGuards.filter(function(guard) {

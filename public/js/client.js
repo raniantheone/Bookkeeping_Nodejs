@@ -11,7 +11,6 @@ require(["clientUtil", "skeleton", "function/expense", "function/income", "funct
   clientUtil.ajaxPost("/auth/checkAuthen").then((payload) => {
     if(!payload.authenIsValid) {
       authenMod.initialize();
-      return;
     }else{
 
       /**
@@ -29,7 +28,7 @@ require(["clientUtil", "skeleton", "function/expense", "function/income", "funct
       * Initialize default function content
       */
       expenseMod.initialize();
-      // authenMod.initialize();
+      skeletonMod.showFunctionHeaderBar();
 
     };
   });

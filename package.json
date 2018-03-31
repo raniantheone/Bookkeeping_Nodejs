@@ -16,6 +16,7 @@
     "cookie-parser": "^1.4.3",
     "couchbase": "^2.4.5",
     "express": "^4.16.2",
+    "uuid": "^3.2.1",
     "winston": "^2.4.1"
   },
   "devDependencies": {

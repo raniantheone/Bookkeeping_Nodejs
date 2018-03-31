@@ -4,6 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
 var cookieParser = require('cookie-parser')
+var uuidV4 = require('uuid/v4');
 var app = express();
 
 app.use(bodyParser.json());
@@ -19,7 +20,7 @@ app.use("/", function(req, res, next) {
   testReqScope.bindEmitter(req);
   testReqScope.bindEmitter(res);
   testReqScope.run(function() {
-    var reqId = Math.random();
+    var reqId = uuidV4().split("-")[0];
     testReqScope.set("reqId", reqId);
     console.log("request id %s set for %s", reqId, req.path);
     next();

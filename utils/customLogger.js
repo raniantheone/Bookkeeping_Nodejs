@@ -20,15 +20,22 @@ let timeFormatUTC = function() {
     }
     return input;
   };
-  return year + "/" + prependLeadingZero(month, 2) + "/" + prependLeadingZero(date, 2) + " " + prependLeadingZero(hours, 2) + ":" + prependLeadingZero(minutes, 2) + ":" + prependLeadingZero(seconds, 2) + ":" + prependLeadingZero(millis, 3);
+  return year + "/" + prependLeadingZero(month, 2) + "/" + prependLeadingZero(date, 2) + "UTC" + prependLeadingZero(hours, 2) + ":" + prependLeadingZero(minutes, 2) + ":" + prependLeadingZero(seconds, 2) + ":" + prependLeadingZero(millis, 3);
 };
 
+function getRequestId() {
+  let requestId = "";
+  if(cls.getNamespace("testReqScope")) {
+    requestId = cls.getNamespace("testReqScope").get("reqId");
+  }
+  return requestId;
+}
 let logger = new (winston.Logger)({
     transports: [
       new (winston.transports.Console)({
         timestamp: timeFormatUTC,
         formatter: function(options) {
-          return options.timestamp() + "::" + config.colorize(options.level, options.level.toUpperCase()) + " " + (options.message ? options.message : "") + " - " + cls.getNamespace("testReqScope").get("reqId");
+          return options.timestamp() + "::" + getRequestId() + " " + config.colorize(options.level, options.level.toUpperCase()) + " " + (options.message ? options.message : "");
         }
       })
     ]

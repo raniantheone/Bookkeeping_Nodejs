@@ -80,7 +80,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     depoDistro.depoNodeRepresentation.setAttribute("id", "depoSubRow_" + depoDistro.id);
     depoDistro.depoNodeRepresentation.querySelector("[name=depoSubName]").textContent = depoDistro.name;
     depoDistro.depoNodeRepresentation.querySelector("[name=depoSubSumAmount]").textContent = depoDistro.subSum;
-    depoDistro.depoNodeRepresentation.style.borderLeftColor = circleResArr.filter((circleRes) => {
+    depoDistro.depoNodeRepresentation.querySelector("[name=toggleArrow]").style.color = circleResArr.filter((circleRes) => {
       return circleRes.id == depoDistro.id;
     }).map((matchedRes) => {
       return matchedRes.color;
@@ -95,7 +95,9 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
       depoDistro.listNodeRepresentation.appendChild(mngAccItemRow);
     });
     depoDistro.depoNodeRepresentation.addEventListener("click", function() {
-      depoDistro.listNodeRepresentation.style.display = depoDistro.listNodeRepresentation.style.display == "none" ? "block" : "none";
+      let listIsHidden = depoDistro.listNodeRepresentation.style.display == "none";
+      depoDistro.listNodeRepresentation.style.display = listIsHidden ? "block" : "none";
+      depoDistro.depoNodeRepresentation.querySelector("[name=toggleArrow]").innerHTML = listIsHidden ? "&#9650;" : "&#9660;";
     });
     return depoDistro;
   };
@@ -113,7 +115,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     mngAccDistro.mngAccNodeRepresentation.setAttribute("id", "mngAccSubRow_" + mngAccDistro.id);
     mngAccDistro.mngAccNodeRepresentation.querySelector("[name=mngAccSubName]").textContent = mngAccDistro.name;
     mngAccDistro.mngAccNodeRepresentation.querySelector("[name=mngAccSubSumAmount]").textContent = mngAccDistro.subSum;
-    mngAccDistro.mngAccNodeRepresentation.style.borderLeftColor = circleResArr.filter((circleRes) => {
+    mngAccDistro.mngAccNodeRepresentation.querySelector("[name=toggleArrow]").style.color = circleResArr.filter((circleRes) => {
       return circleRes.id == mngAccDistro.id;
     }).map((matchedRes) => {
       return matchedRes.color;
@@ -128,7 +130,9 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
       mngAccDistro.listNodeRepresentation.appendChild(depoItemRow);
     });
     mngAccDistro.mngAccNodeRepresentation.addEventListener("click", function() {
-      mngAccDistro.listNodeRepresentation.style.display = mngAccDistro.listNodeRepresentation.style.display == "none" ? "block" : "none";
+      let listIsHidden = mngAccDistro.listNodeRepresentation.style.display == "none";
+      mngAccDistro.listNodeRepresentation.style.display = listIsHidden ? "block" : "none";
+      mngAccDistro.mngAccNodeRepresentation.querySelector("[name=toggleArrow]").innerHTML = listIsHidden ? "&#9650;" : "&#9660;";
     });
     return mngAccDistro;
   };

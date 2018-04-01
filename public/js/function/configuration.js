@@ -42,6 +42,18 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
     return name;
   };
 
+  function getListedDepoDisplayName() {
+    let depoNames = [];
+    configUi.depoList.querySelectorAll("[name=displayName]").forEach((node) => { depoNames.push(node.textContent); });
+    return depoNames;
+  };
+
+  function getListedMngAccDisplayName() {
+    let mngAccNames = [];
+    configUi.mngAccList.querySelectorAll("[name=displayName]").forEach((node) => { mngAccNames.push(node.textContent); });
+    return mngAccNames;
+  };
+
   function refreshconfigUi() {
     configUi.contentNode = new DOMParser().parseFromString(configHtml, "text/html").getElementById("funcConfiguration");
     configUi.depoListToggle = configUi.contentNode.querySelector("#depoListToggle");
@@ -184,7 +196,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
           let payload = {
             ownerId: "trista167@gmail.com", // TODO remove hardcode
             displayName: displayNameText.value
-          }
+          };
+          let conflictNameValidator = clientUtil.createValidator(
+            displayNameText,
+            (name) => {
+              return !getListedDepoDisplayName().includes(name);
+            },
+            "The specified new name is already taken by another depository, please provide a new one"
+          );
           if(depoId && depoId.length > 0) {
 
             payload.depoId = depoId;
@@ -203,8 +222,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
             promptNextModalConfig.modalHeaderNode.textContent = "Update Depository";
             promptNextModalConfig.modalContentNode.textContent = "Update depository name from " + displayName + " to " + payload.displayName + "?";
 
-            // TODO front-end validation
-            serverActionWrapper(null, promptNextModalConfig);
+            let sameNameValidator = clientUtil.createValidator(
+              displayNameText,
+              (name) => {
+                return name != getDepoDisplayName(depoId);
+              },
+              "Please specify a new depository name"
+            );
+            serverActionWrapper([sameNameValidator, conflictNameValidator], promptNextModalConfig);
 
           }else{
 
@@ -222,8 +247,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
             promptNextModalConfig.modalHeaderNode.textContent = "New Depository";
             promptNextModalConfig.modalContentNode.textContent = "Add a new depository: " + payload.displayName + "?";
 
-            // TODO front-end validation
-            serverActionWrapper(null, promptNextModalConfig);
+            serverActionWrapper([conflictNameValidator], promptNextModalConfig);
 
           }
 
@@ -270,8 +294,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
           promptNextModalConfig.modalHeaderNode.textContent = "Confirm Delete";
           promptNextModalConfig.modalContentNode.innerHTML = "Delete depository: " + displayName + "?<br> Warning: records under this depository will be deleted as well!";
 
-          // TODO front-end validation
-          serverActionWrapper(null, promptNextModalConfig);
+          let depoNotInUseValidator = clientUtil.createValidator(
+            "",
+            () => {
+              return !serverData.initializedCombo.map((combo) => { return combo.depoId; }).includes(depoId);
+            },
+            "This depository is initialized. If you want to delete it, please delete the corresponding initialized combination first. Please be aware that this will delete your expense and income records which are related to this depository."
+          );
+          serverActionWrapper([depoNotInUseValidator], promptNextModalConfig);
 
         });
         nodeRepresentation = node;
@@ -330,7 +360,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
           let payload = {
             ownerId: "trista167@gmail.com", // TODO remove hardcode
             displayName: displayNameText.value
-          }
+          };
+          let conflictNameValidator = clientUtil.createValidator(
+            displayNameText,
+            (name) => {
+              return !getListedMngAccDisplayName().includes(name);
+            },
+            "The specified new name is already taken by another managing account, please provide a new one"
+          );
           if(mngAccId && mngAccId.length > 0) {
 
             payload.mngAccId = mngAccId;
@@ -349,8 +386,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
             promptNextModalConfig.modalHeaderNode.textContent = "Update Managing Account";
             promptNextModalConfig.modalContentNode.textContent = "Update depository name from " + displayName + " to " + payload.displayName + "?";
 
-            // TODO front-end validation
-            serverActionWrapper(null, promptNextModalConfig);
+            let sameNameValidator = clientUtil.createValidator(
+              displayNameText,
+              (name) => {
+                return name != getMngAccDisplayName(mngAccId);
+              },
+              "Please specify a new managing account name"
+            );
+            serverActionWrapper([sameNameValidator, conflictNameValidator], promptNextModalConfig);
 
           }else{
 
@@ -368,8 +411,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
             promptNextModalConfig.modalHeaderNode.textContent = "New Managing Account";
             promptNextModalConfig.modalContentNode.textContent = "Add a new managing account: " + payload.displayName + "?";
 
-            // TODO front-end validation
-            serverActionWrapper(null, promptNextModalConfig);
+            serverActionWrapper([conflictNameValidator], promptNextModalConfig);
 
           }
 
@@ -416,8 +458,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
           promptNextModalConfig.modalHeaderNode.textContent = "Confirm Delete";
           promptNextModalConfig.modalContentNode.innerHTML = "Delete Managing Account: " + displayName + "?<br> Warning: records under this managing account will be orphan records!";
 
-          // TODO front-end validation
-          serverActionWrapper(null, promptNextModalConfig);
+          let mngAccNotInUseValidator = clientUtil.createValidator(
+            "",
+            () => {
+              return !serverData.initializedCombo.map((combo) => { return combo.mngAccId; }).includes(mngAccId);
+            },
+            "This managing account is initialized. If you want to delete it, please delete the corresponding initialized combination first. Please be aware that this will make your expense and income records which are related to this managing account unaccessible, i.e., they will not be calculated in distribution anymore."
+          );
+          serverActionWrapper([mngAccNotInUseValidator], promptNextModalConfig);
 
         });
         nodeRepresentation = node;
@@ -501,6 +549,13 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
             mngAccId: mngAccId,
             initAmount: initAmount.value
           };
+          let initAmountValidator = clientUtil.createValidator(
+            initAmount,
+            (amount) => {
+              return amount >= 0;
+            },
+            "Please provide an initial amount greater than or equal to 0."
+          );
           if(mode == "new") {
 
             payload.depoId = depoSelect.value;
@@ -520,8 +575,16 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
             promptNextModalConfig.modalHeaderNode.textContent = "Initialize Combination";
             promptNextModalConfig.modalContentNode.textContent = "Add a new combination of " + getDepoDisplayName(payload.depoId) + " - " + getMngAccDisplayName(payload.mngAccId) + " with initial amount " + payload.initAmount + "?";
 
-            // TODO front-end validation
-            serverActionWrapper(null, promptNextModalConfig);
+            let duplicatedComboValidator = clientUtil.createValidator(
+              "",
+              () => {
+                return serverData.initializedCombo.filter((combo) => {
+                  return combo.depoId == payload.depoId && combo.mngAccId == payload.mngAccId;
+                }).length == 0;
+              },
+              "There is aleardy a combination that use the same depository and managing account. Please specify another depository or managing account."
+            );
+            serverActionWrapper([duplicatedComboValidator, initAmountValidator], promptNextModalConfig);
 
           }else{
 
@@ -539,8 +602,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
             promptNextModalConfig.modalHeaderNode.textContent = "Update Combination";
             promptNextModalConfig.modalContentNode.textContent = "Change initial amount of " + getDepoDisplayName(payload.depoId) + " - " + getMngAccDisplayName(payload.mngAccId) + " to " + payload.initAmount + " from now? If you do so, records before this moment will not be calculated.";
 
-            // TODO front-end validation
-            serverActionWrapper(null, promptNextModalConfig);
+            serverActionWrapper([initAmountValidator], promptNextModalConfig);
 
           }
 

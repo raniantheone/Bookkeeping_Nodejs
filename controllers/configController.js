@@ -378,9 +378,9 @@ exports.initializeDepositoryManagingAccount = async function(req, res) {
       , req.body.ownerId
       , req.body.mngAccId);
     var initAmountGuard = vldUtil.createGuard(
-      vldUtil.isNumGreaterThanZero
-      , "initial amount is greater than zero"
-      , "initial amount is not greater than zero"
+      vldUtil.isNumGreaterThanOrEqualToZero
+      , "initial amount is greater than or equal to zero"
+      , "initial amount is less than zero"
       , req.body.initAmount);
     var checkResult = await vldUtil.asyncGuardsCheck([
       ownerIdGuard,

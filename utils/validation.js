@@ -57,6 +57,11 @@ exports.isNumGreaterThanZero = function(inputNum) {
   return !isNaN(inputNum) && inputNum > 0;
 }
 
+exports.isNumGreaterThanOrEqualToZero = function(inputNum) {
+  console.log("isNumGreaterThanOrEqualToZero : " + inputNum);
+  return !isNaN(inputNum) && inputNum >= 0;
+}
+
 exports.isDate = function(dateStr) {
   console.log("isDate : " + dateStr);
   return !isNaN(Date.parse(dateStr));

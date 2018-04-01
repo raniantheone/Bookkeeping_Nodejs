@@ -153,3 +153,20 @@ exports.getInitDepoMngAccAndPref = async function(ownerId) {
   }
   return initializedDepoMngAccAndUserPref;
 }
+
+exports.saveIncomePref = async function(transIssuer, preferredIncomeDepo, preferredIncomeMngAcc) {
+  var operSuccess = false;
+  try {
+    var userPrefArr = [];
+    if(preferredIncomeDepo) {
+      userPrefArr.push({ preferredIncomeDepo: preferredIncomeDepo });
+    };
+    if(preferredIncomeMngAcc) {
+      userPrefArr.push({ preferredIncomeMngAcc: preferredIncomeMngAcc });
+    };
+    operSuccess = datastoreSvc.saveUserPrefs(transIssuer, userPrefArr);
+  } catch(err) {
+    console.log(err + " <-- err happend; process layer - saveIncomePref consumes it and returns default value");
+  };
+  return operSuccess;
+}

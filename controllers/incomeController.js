@@ -102,6 +102,14 @@ exports.keepIncomeRecord = async function(req, res) {
         , req.body.depo
         , req.body.mngAcc
       );
+
+      if(req.body.preferredIncomeDepo || req.body.preferredIncomeMngAcc) {
+        await incomeProc.saveIncomePref(
+          req.body.transIssuer
+          , req.body.preferredIncomeDepo
+          , req.body.preferredIncomeMngAcc
+        );
+      };
     } else {
       respContent.payload = checkResult.allGuards.filter(function(guard) {
         return !guard.isValid;

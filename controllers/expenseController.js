@@ -105,8 +105,8 @@ exports.keepExpenseRecord = async function(req, res) {
 
     // save preference if exist
     // as long as main process(save record) is success, the whole process is treated as completed
-    if(req.body.preferredDepo || req.body.preferredMngAcc) {
-      expenssProc.asyncKeepFreqExpenseDepoMngAccPref(req.body.transIssuer, req.body.preferredDepo, req.body.preferredMngAcc)
+    if(req.body.preferredExpenseDepo || req.body.preferredExpenseMngAcc) {
+      expenssProc.asyncKeepFreqExpenseDepoMngAccPref(req.body.transIssuer, req.body.preferredExpenseDepo, req.body.preferredExpenseMngAcc)
       .then((res) => {
         console.log("pref saved");
         console.log(res);

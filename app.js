@@ -33,9 +33,9 @@ var analysisRouter = require("./routes/analysis");
 var authenRouter = require("./routes/authentication");
 var authenController = require("./controllers/authenticationController");
 
-app.use("/auth", authenRouter);
+app.use("/auth", authenRouter); // authentication check and login action will not be blocked by authentication check
 
-app.use("/", authenController.authenticationGuard);
+app.use("/", authenController.authenticationGuard); // make sure that request passed to the handlers below is sent by an authenticated client
 
 app.use("/flow", flowRouter);
 

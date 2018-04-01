@@ -4,8 +4,8 @@ define(function() {
     getDateIptStr: function(dateObj) {
       var year = dateObj.getFullYear();
       var month = (parseInt(dateObj.getMonth()) + 1).toString();
-      var date = dateObj.getDate();
-      var dateStr = year + "-" + (month.length == 1 ? "0" + month : month) + "-" + date;
+      var date = dateObj.getDate().toString();
+      var dateStr = year + "-" + (month.length == 1 ? "0" + month : month) + "-" + (date.length == 1 ? "0" + date : date);
       return dateStr;
     },
     getDateObjFromDateIpt: function(dateIptValue) {

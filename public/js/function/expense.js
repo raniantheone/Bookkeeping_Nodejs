@@ -52,14 +52,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html
       payload.preferredExpenseDepo = expenseUi.selectDepo.value;
     }else if(expenseUi.depoPrefHeart.dataset.toggle == "off"
       && (serverData.userPref.preferredExpenseDepo == expenseUi.selectDepo.value)) {
-      payload.preferredExpenseDepo = null;
+      payload.preferredExpenseDepo = "cancelled";
     };
     if(expenseUi.mngAccPrefHeart.dataset.toggle == "on"
       && !(serverData.userPref.preferredExpenseMngAcc == expenseUi.selectMngAcc.value)) {
       payload.preferredExpenseMngAcc = expenseUi.selectMngAcc.value;
     }else if(expenseUi.mngAccPrefHeart.dataset.toggle == "off"
       && (serverData.userPref.preferredExpenseMngAcc == expenseUi.selectMngAcc.value)) {
-      payload.preferredExpenseMngAcc = null;
+      payload.preferredExpenseMngAcc = "cancelled";
     };
     console.log(payload);
     let isSuccess = false;

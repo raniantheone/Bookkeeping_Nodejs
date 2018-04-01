@@ -52,14 +52,14 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/income.html"
       payload.preferredIncomeDepo = incomeUi.selectDepo.value;
     }else if(incomeUi.depoPrefHeart.dataset.toggle == "off"
       && (serverData.userPref.preferredIncomeDepo == incomeUi.selectDepo.value)) {
-      payload.preferredIncomeDepo = null;
+      payload.preferredIncomeDepo = "cancelled";
     };
     if(incomeUi.mngAccPrefHeart.dataset.toggle == "on"
       && !(serverData.userPref.preferredIncomeMngAcc == incomeUi.selectMngAcc.value)) {
       payload.preferredIncomeMngAcc = incomeUi.selectMngAcc.value;
     }else if(incomeUi.mngAccPrefHeart.dataset.toggle == "off"
       && (serverData.userPref.preferredIncomeMngAcc == incomeUi.selectMngAcc.value)) {
-      payload.preferredIncomeMngAcc = null;
+      payload.preferredIncomeMngAcc = "cancelled";
     };
     console.log(payload);
     let isSuccess = false;

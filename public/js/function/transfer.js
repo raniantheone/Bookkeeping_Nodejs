@@ -310,8 +310,28 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/transfer.htm
       promptNextModalConfig.modalHeaderNode.textContent = "Confirm Transfer";
       promptNextModalConfig.modalContentNode.textContent = "Transfer " + payload.transAmount + " from " + getDepoDisplayName(payload.sourceDepo) + " - " + getMngAccDisplayName(payload.sourceMngAcc) + " to " + getDepoDisplayName(payload.targetDepo) + " - " + getMngAccDisplayName(payload.targetMngAcc) + "?";
 
-      // TODO front-end validation
-      skeletonMod.serverActionWrapper(null, promptNextModalConfig);
+      let transAmountValidator = clientUtil.createValidator(
+        transferUi.transAmount,
+        (amount) => {
+          return amount > 0;
+        },
+        "Please provide an amount greater than 0"
+      );
+      let sourceAndTargetSpecifiedValidator = clientUtil.createValidator(
+        "",
+        () => {
+          return source.depoId.length > 0 && target.depoId.length > 0;
+        },
+        "Please pick both source and target."
+      );
+      let sourceNotEqualToTargetValidator = clientUtil.createValidator(
+        "",
+        () => {
+          return source.depoId != target.depoId || source.mngAccId != target.mngAccId;
+        },
+        "Source and target cannot be the same. Please change at least one of them."
+      );
+      skeletonMod.serverActionWrapper([transAmountValidator, sourceAndTargetSpecifiedValidator, sourceNotEqualToTargetValidator], promptNextModalConfig);
     });
 
     transAmount.showEmpty();

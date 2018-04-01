@@ -1,4 +1,4 @@
-define(function() {
+define(["./clientUtil"], function(clientUtil) {
 
   var modalHeader = document.getElementById("modalHeader");
   var modalContentContainer = document.getElementById("modalContentContainer");

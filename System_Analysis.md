@@ -963,3 +963,15 @@ output if operation failed
 ### /config/editMngAcc
 
 ### /config/deleteMngAcc
+
+
+## Log
+
+### Production
+Who access what resource at when, and what is the response of the system?
+Key conditionals in business logic flow
+System error
+Request/Response performance
+
+### Development
+Input/output of each method

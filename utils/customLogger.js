@@ -1,7 +1,9 @@
 let cls = require('cls-hooked');
+var path = require('path');
+var config = require("../config/sysConfig");
 
 let winston = require("winston");
-let config = winston.config;
+let winstonConfig = winston.config;
 let timeFormatUTC = function() {
   let dateObj = new Date();
   let year = dateObj.getUTCFullYear();
@@ -29,23 +31,34 @@ function getRequestId() {
     requestId = cls.getNamespace("testReqScope").get("reqId");
   }
   return requestId;
-}
-let logger = new (winston.Logger)({
-    transports: [
-      new (winston.transports.Console)({
-        timestamp: timeFormatUTC,
-        formatter: function(options) {
-          return options.timestamp() + "::" + getRequestId() + " " + config.colorize(options.level, options.level.toUpperCase()) + " " + (options.message ? options.message : "");
-        }
-      })
-    ]
+};
+
+function customFormat(options) {
+  return options.timestamp() + "::" + getRequestId() + " " + winstonConfig.colorize(options.level, options.level.toUpperCase()) + " " + (options.message ? options.message : "");
+};
+
+let consoleTransport = new (winston.transports.Console)({
+  timestamp: timeFormatUTC,
+  formatter: customFormat
 });
 
-logger.error("customLogger instantiated");
-logger.warn("customLogger instantiated");
-logger.info("customLogger instantiated");
-logger.verbose("customLogger instantiated");
-logger.debug("customLogger instantiated");
-logger.silly("customLogger instantiated");
+let fileTransport = new (winston.transports.File)({
+  level: "info",
+  colorize: true,
+  timestamp: timeFormatUTC,
+  formatter: customFormat,
+  filename: path.join(__filename, "../../logs/application.log"),
+  json: false
+});
+
+let transports = [];
+transports.push(fileTransport);
+if(config.env == "dev") {
+  transports.push(consoleTransport);
+};
+
+let logger = new (winston.Logger)({
+    transports: transports
+});
 
 exports.logger = logger;

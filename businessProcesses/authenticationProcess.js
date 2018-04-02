@@ -4,6 +4,7 @@ var logger = logUtil.logger;
 var datastoreSvc = require("../services/datastoreService");
 var userFactory = require("../businessProcesses/models/user");
 var hashUtil = require("../utils/hash");
+let config = require("../config/sysConfig");
 
 
 exports.isValidUser = async function(ownerId, password) {
@@ -27,7 +28,7 @@ exports.buildAccessData = async function(ownerId, password) {
   };
   try {
     accessData.token = hashUtil.simpleHash(ownerId + password + new Date().toISOString());
-    accessData.maxAge = 120;
+    accessData.maxAge = config.authenMaxAgeSec;
     accessData.type = "token";
     accessData.ownerId = ownerId;
     await datastoreSvc.insertAccessData(accessData);

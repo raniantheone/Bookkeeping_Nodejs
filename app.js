@@ -6,6 +6,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser')
 var uuidV4 = require('uuid/v4');
 var app = express();
+var config = require("./config/sysConfig");
 
 app.use(bodyParser.json());
 

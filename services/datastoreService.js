@@ -5,6 +5,8 @@ let couchbase = require('couchbase');
 let cluster = new couchbase.Cluster('couchbase://localhost/');
 cluster.authenticate('Administrator', 'password');
 let bucket = cluster.openBucket('bookkeeping');
+let config = require("../config/sysConfig");
+
 
 exports.queryDepoMngAccAndPreselect = async function(ownerId) {
   return new Promise((resolve, reject) => {
@@ -176,36 +178,14 @@ exports.queryExistingUser = async function(ownerId) {
     logger.info(JSON.stringify(res.value));
     return res.value;
   }).catch((err) => {
-    if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
+    if(err.code == config.couchbase.errorCode.noSuchKey) { // {"message":"The key does not exist on the server","code":13}
       console.error("User: %j does not exist", ownerId);
       return null;
     }else{
       console.error("Couldn't query existing user: %j", err);
       throw new Error(err);
     };
-  })
-
-  // return new Promise((resolve, reject) => {
-  //   logger.info("queryExistingUser invoked ... in promise process");
-  //   bucket.get(
-  //     ownerId + "::user",
-  //     (err, res) => {
-  //       if (!err) {
-  //         logger.info("Query existing user successfully. User is");
-  //         logger.info(JSON.stringify(res.value));
-  //         resolve(res.value);
-  //       } else {
-  //         if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
-  //           resolve(null);
-  //           return;
-  //         }
-  //         console.error("Couldn't query existing user: %j", err);
-  //         reject(err);
-  //       }
-  //     }
-  //   );
-  // });
-
+  });
 }
 
 exports.queryDepoMngAccWithInitValue = async function(ownerId) {
@@ -247,7 +227,7 @@ exports.queryDepoById = async function(depoId) {
             resolve(res.value);
           }
         } else {
-          if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
+          if(err.code == config.couchbase.errorCode.noSuchKey) { // {"message":"The key does not exist on the server","code":13}
             resolve(null);
             return;
           }
@@ -352,7 +332,7 @@ exports.queryMngAccById = async function(mngAccId) {
             resolve(res.value);
           }
         } else {
-          if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
+          if(err.code == config.couchbase.errorCode.noSuchKey) { // {"message":"The key does not exist on the server","code":13}
             resolve(null);
             return;
           }
@@ -629,14 +609,14 @@ exports.queryAccessData = async function(accessToken) {
   return new Promise((resolve, reject) => {
     bucket.getAndTouch(
       accessToken.toString(),
-      300,
+      config.authenMaxAgeSec,
       (err, res) => {
         if (!err) {
           console.log("Query access data successfully. Data is");
           console.log(res.value);
           resolve(res.value);
         } else {
-          if(err.code == 13) { // {"message":"The key does not exist on the server","code":13}
+          if(err.code == config.couchbase.errorCode.noSuchKey) { // {"message":"The key does not exist on the server","code":13}
             resolve(null);
             return;
           }

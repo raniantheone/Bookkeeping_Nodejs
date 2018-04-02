@@ -3,6 +3,7 @@ var logUtil = require("../utils/customLogger");
 var logger = logUtil.logger;
 var authenProc = require("../businessProcesses/authenticationProcess");
 var vldUtil = require("../utils/validation");
+var config = require("../config/sysConfig");
 
 
 // check if the request is from a valid user, return only when check failed, otherwise pass req to next controller

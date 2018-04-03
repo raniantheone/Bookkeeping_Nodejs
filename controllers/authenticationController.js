@@ -61,8 +61,8 @@ exports.login = async function(req, res) {
       let isValid = await authenProc.isValidUser(ownerId, password);
       if(isValid) {
         let accessData = await authenProc.buildAccessData(ownerId, password);
-        res.cookie("accessToken", accessData.token, { maxAge: 300000 }); // TODO test temp const
-        res.cookie("user", req.body.ownerId, { maxAge: 300000 }); // TODO test temp const
+        res.cookie("accessToken", accessData.token, { maxAge: config.authenMaxAgeSec * 1000 });
+        res.cookie("user", req.body.ownerId, { maxAge: config.authenMaxAgeSec * 1000 });
         respContent.payload = true;
       }else{
         respContent.payload = false;

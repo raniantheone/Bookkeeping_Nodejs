@@ -1,4 +1,4 @@
-let env = process.env.ENV;
+let env = process.env.ENV || "dev";
 
 // default config
 function buildConfigComponent() {
@@ -15,7 +15,7 @@ let config = buildConfigComponent();
 
 config.env = env;
 config.test = "test from default";
-config.authenMaxAgeSec = 300;
+config.authenMaxAgeSec = 7200;
 
 config.couchbase.errorCode.noSuchKey = 13;
 

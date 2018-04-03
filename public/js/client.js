@@ -6,7 +6,7 @@ require.config({
   }
 });
 
-require(["clientUtil", "skeleton", "function/expense", "function/income", "function/configuration", "function/transfer", "function/distribution", "function/authentication"], function(clientUtil, skeletonMod, expenseMod, incomeMod, configMod, transferMod, distroMod, authenMod) {
+require(["clientUtil", "skeleton", "function/expense", "function/income", "function/configuration", "function/transfer", "function/distribution", "function/authentication", "function/records"], function(clientUtil, skeletonMod, expenseMod, incomeMod, configMod, transferMod, distroMod, authenMod, recordsMod) {
 
   clientUtil.ajaxPost("/auth/checkAuthen").then((payload) => {
     if(!payload.authenIsValid) {
@@ -23,11 +23,12 @@ require(["clientUtil", "skeleton", "function/expense", "function/income", "funct
       skeletonMod.registerNavFunction(configMod);
       skeletonMod.registerNavFunction(transferMod);
       skeletonMod.registerNavFunction(distroMod);
+      skeletonMod.registerNavFunction(recordsMod);
 
       /**
       * Initialize default function content
       */
-      expenseMod.initialize();
+      recordsMod.initialize();
       skeletonMod.showFunctionHeaderBar();
 
     };

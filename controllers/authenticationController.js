@@ -89,7 +89,7 @@ exports.checkAuthenStat = async function(req, res) {
   let respContent = {
     authenIsValid: false
   };
-  if(Object.keys(cookies).length != 0) {
+  if(cookies.accessToken && cookies.user) {
     respContent.authenIsValid = await authenProc.checkAccessData(cookies.accessToken, cookies.user);
   };
   res.json(respContent);

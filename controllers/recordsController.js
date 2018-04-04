@@ -23,7 +23,23 @@ exports.checkRecords = async function(req, res) {
       , "transIssuer does not exist"
       , req.body.transIssuer
     );
-    var checkResult = await vldUtil.asyncGuardsCheck([transIssuerGuard]);
+    var pageNumGuard = vldUtil.createGuard(
+      vldUtil.isNumGreaterThanZero
+      , "page number is OK"
+      , "page number is not greater than 0"
+      , req.body.page
+    );
+    var entriesNumGuard = vldUtil.createGuard(
+      vldUtil.isNumGreaterThanZero
+      , "entries per page is OK"
+      , "entries per page is not greater than 0"
+      , req.body.entriesPerPage
+    );
+    var checkResult = await vldUtil.asyncGuardsCheck([
+      transIssuerGuard
+      , pageNumGuard
+      , entriesNumGuard
+    ]);
 
     if(checkResult.allValidated) {
       respContent.payload = await recordsProc.searchMatchedRecords(
@@ -31,6 +47,9 @@ exports.checkRecords = async function(req, res) {
         , req.body.endTime
         , req.body.ownerId
         , req.body.transIssuer
+        , Math.floor(req.body.page)
+        , Math.floor(req.body.entriesPerPage)
+        , req.body.getCount
       );
     }else{
       respContent.payload = checkResult.allGuards.filter(function(guard) {

@@ -17,11 +17,8 @@ exports.transIssuerExists = async function(transIssuer) {
   return itExists;
 }
 
-exports.searchMatchedRecords = async function(startTime, endTime, ownerId, transIssuer) {
-  var matchedRecords = {
-    records: [],
-    count: 0
-  };
+exports.searchMatchedRecords = async function(startTime, endTime, ownerId, transIssuer, page, entriesPerPage, getCount) {
+  var matchedRecords = null;
   try {
 
     if(!vldUtil.isDate(startTime)) {
@@ -36,28 +33,22 @@ exports.searchMatchedRecords = async function(startTime, endTime, ownerId, trans
       ownerId = null;
       logger.info("Ignore opotional ownerId, because passed-in value is" + ownerId);
     };
-    var rawRecords = await datastoreSvc.queryFlowRecord(startTime, endTime, ownerId, transIssuer);
-
     var availableDepos = await datastoreSvc.queryAvailableDepos(transIssuer);
     var availableMngAccs = await datastoreSvc.queryAvailableMngAccs(transIssuer);
 
-    matchedRecords.records = rawRecords.map((rawRecord) => {
-      let record = rawRecord;
-      [record.depoName] = availableDepos.filter((depo) => {
-        return depo.id == record.depo;
-      }).map((matchedDepo) => {
-        return matchedDepo.displayName;
-      });
-      [record.mngAccName] = availableMngAccs.filter((mngAcc) => {
-        return mngAcc.id == record.mngAcc;
-      }).map((matchedMngAcc) => {
-        return matchedMngAcc.displayName;
-      });
-      return record;
-    }).filter((record) => {
-      return vldUtil.isNotEmpty(record.depoName) && vldUtil.isNotEmpty(record.mngAccName); // if the depo or mngAcc is not available to the issuer, he/she cannot access it anymore
-    });
-    matchedRecords.count = matchedRecords.records.length;
+    var matchedRecords = await datastoreSvc.queryFlowRecord(
+      startTime,
+      endTime,
+      ownerId,
+      transIssuer,
+      availableDepos.map((depo) => { return depo.id; }),
+      availableMngAccs.map((mngAcc) => { return mngAcc.id; }),
+      {
+        page: page,
+        entriesPerPage: entriesPerPage,
+        getCount: getCount
+      }
+    );
 
   } catch(err) {
     logger.error(err + " <-- err happend; process searchMatchedRecords consumes it and returns default value");

@@ -89,14 +89,27 @@
 //   console.log(err);
 // });
 
+// var p = datastoreSvc.queryFlowRecord(
+//   null,
+//   null,
+//   null,
+//   "trista167@gmail.com",
+//   null,
+//   null,
+//   {
+//     entriesPerPage: 10,
+//     page: 9,
+//     getCount: true
+//   }
+// );
+
 // var p = datastoreSvc.queryFlowRecord(null, null, null, "trista167@gmail.com");
 // var p = datastoreSvc.queryFlowRecord(null, null, null, "raniantheone@gmail.com");
 // var p = datastoreSvc.queryFlowRecord(null, new Date("2018-02-01T23:59:59.999Z"), null, "trista167@gmail.com");
-//
+
 // p.then((dbData) => {
 //   console.log("oper success");
 //   console.log(dbData);
-//   console.log(dbData.length);
 // }).catch((err) => {
 //   console.log(err);
 // });

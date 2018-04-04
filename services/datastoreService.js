@@ -628,31 +628,51 @@ exports.queryAccessData = async function(accessToken) {
   });
 };
 
-exports.queryFlowRecord = async function(startTime, endTime, ownerId, issuerId) {
+exports.queryFlowRecord = async function(startTime, endTime, ownerId, issuerId, availDepoIds, availMngAccIds, pagination) {
+
+  let queryResult = {
+    flowRecords: [],
+    count: 0
+  };
 
   let startTimeClause = "";
   if(startTime) {
-    startTimeClause = "AND DATE_DIFF_STR(transDateTime, $1, 'millisecond') >= 0";
+    startTimeClause = " AND DATE_DIFF_STR(transDateTime, $1, 'millisecond') >= 0 ";
   };
 
   let endTimeClause = "";
   if(endTime) {
-    endTimeClause = "AND DATE_DIFF_STR(transDateTime, $2, 'millisecond') <= 0";
+    endTimeClause = " AND DATE_DIFF_STR(transDateTime, $2, 'millisecond') <= 0 ";
   };
 
   let ownerIdClause = "";
   if(ownerId) {
-    ownerIdClause = "OR ownerId = $3";
+    ownerIdClause = " OR ownerId = $3 ";
+  };
+
+  let availDepoIdsClause = "";
+  if(availDepoIds) {
+    availDepoIdsClause = " AND depo IN $5 ";
+  };
+
+  let availMngAccIdsClause = "";
+  if(availMngAccIds) {
+    availMngAccIdsClause = " AND mngAcc IN $6 ";
+  };
+
+  let paginationClause = "";
+  if(pagination) {
+    paginationClause = " OFFSET " + (pagination.page - 1) * pagination.entriesPerPage + " LIMIT " + pagination.entriesPerPage;
   };
 
   let N1qlQuery = couchbase.N1qlQuery;
-  let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + startTimeClause + endTimeClause);
+  let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + availDepoIdsClause + availMngAccIdsClause + startTimeClause + endTimeClause + " ORDER BY transDateTime DESC" + paginationClause);
   queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
 
-  return await new Promise((resolve, reject) => {
+  queryResult.flowRecords = await new Promise((resolve, reject) => {
     bucket.query(
       queryStr,
-      [startTime, endTime, ownerId, issuerId],
+      [startTime, endTime, ownerId, issuerId, availDepoIds, availMngAccIds],
       (err, res) => {
         if (!err) {
           resolve(res);
@@ -663,11 +683,36 @@ exports.queryFlowRecord = async function(startTime, endTime, ownerId, issuerId) 
     );
   }).then((res) => {
     res = res.map((entry) => { return entry.bookkeeping });
-    console.log(res);
+    logger.debug(res);
     return res;
   }).catch((err) => {
-    console.log(err);
+    logger.error(err);
     throw new Error(err);
   });
+
+  if(pagination.getCount) {
+    let queryStr = N1qlQuery.fromString("SELECT COUNT(itemName) AS count FROM `bookkeeping` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + availDepoIdsClause + availMngAccIdsClause + startTimeClause + endTimeClause);
+    queryResult.count = await new Promise((resolve, reject) => {
+      bucket.query(
+        queryStr,
+        [startTime, endTime, ownerId, issuerId, availDepoIds, availMngAccIds],
+        (err, res) => {
+          if (!err) {
+            resolve(res);
+          } else {
+            reject(err);
+          };
+        }
+      );
+    }).then((res) => {
+      logger.debug(res);
+      return res[0].count;
+    }).catch((err) => {
+      logger.error(err);
+      throw new Error(err);
+    });
+  };
+
+  return queryResult;
 
 };

@@ -31,17 +31,20 @@ app.use("/", function(req, res, next) {
 var flowRouter = require("./routes/flow");
 var configRouter = require("./routes/config");
 var analysisRouter = require("./routes/analysis");
+var recordsRouther = require("./routes/records");
 var authenRouter = require("./routes/authentication");
 var authenController = require("./controllers/authenticationController");
 
 app.use("/auth", authenRouter); // authentication check and login action will not be blocked by authentication check
 
-app.use("/", authenController.authenticationGuard); // make sure that request passed to the handlers below is sent by an authenticated client
+// app.use("/", authenController.authenticationGuard); // make sure that request passed to the handlers below is sent by an authenticated client
 
 app.use("/flow", flowRouter);
 
 app.use("/config", configRouter);
 
 app.use("/analysis", analysisRouter);
+
+app.use("/records", recordsRouther);
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));

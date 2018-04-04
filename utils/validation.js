@@ -43,12 +43,12 @@ exports.asyncGuardsCheck = async function(guards) {
 */
 exports.isEmpty = isEmpty;
 function isEmpty(inputStr) {
-  console.log("isEmpty : " + inputStr);
+  // console.log("isEmpty : " + inputStr);
   return inputStr === null || inputStr === undefined || inputStr.length === 0;
 }
 
 exports.isNotEmpty = function(inputStr) {
-  console.log("isNotEmpty : " + inputStr);
+  // console.log("isNotEmpty : " + inputStr);
   return !isEmpty(inputStr);
 }
 

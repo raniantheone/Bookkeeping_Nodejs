@@ -627,3 +627,47 @@ exports.queryAccessData = async function(accessToken) {
     );
   });
 };
+
+exports.queryFlowRecord = async function(startTime, endTime, ownerId, issuerId) {
+
+  let startTimeClause = "";
+  if(startTime) {
+    startTimeClause = "AND DATE_DIFF_STR(transDateTime, $1, 'millisecond') >= 0";
+  };
+
+  let endTimeClause = "";
+  if(endTime) {
+    endTimeClause = "AND DATE_DIFF_STR(transDateTime, $2, 'millisecond') <= 0";
+  };
+
+  let ownerIdClause = "";
+  if(ownerId) {
+    ownerIdClause = "OR ownerId = $3";
+  };
+
+  let N1qlQuery = couchbase.N1qlQuery;
+  let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + startTimeClause + endTimeClause);
+  queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+
+  return await new Promise((resolve, reject) => {
+    bucket.query(
+      queryStr,
+      [startTime, endTime, ownerId, issuerId],
+      (err, res) => {
+        if (!err) {
+          resolve(res);
+        } else {
+          reject(err);
+        };
+      }
+    );
+  }).then((res) => {
+    res = res.map((entry) => { return entry.bookkeeping });
+    console.log(res);
+    return res;
+  }).catch((err) => {
+    console.log(err);
+    throw new Error(err);
+  });
+
+};

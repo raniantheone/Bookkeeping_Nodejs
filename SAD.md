@@ -1,163 +1,5 @@
-## Feature Name
-
-### Activity Flow
-
-### Description
-
-### Requirement Mapping
-
----
-
-
-## Display Total Expense of This Month
-
----
-
-## Create An Expense Record
-
-### Main Flow
-
-```puml
-|User|
-start
-:Access expense entry form;
-|System|
-:Display expense entry form;
-|User|
-repeat
-:Fill in the form;
-:Submit the form;
-|System|
-:Validate form data;
-repeat while (invalid data?)
-:Add an expense record;
-:Display operation result;
-stop
-```
-
----
-
-## Create An Income Record
-
-### Main Flow
-
-```puml
-|User|
-start
-:Access income entry form;
-|System|
-:Display income entry form;
-|User|
-repeat
-:Fill in the form;
-:Submit the form;
-|System|
-:Validate form data;
-repeat while (invalid data?)
-:Add an income record;
-:Display operation result;
-stop
-```
-
----
-
-## Configure Depository
-
-### Main Flow
-
-```puml
-|User|
-start
-:Access configuration form;
-|System|
-:Display configuration form;
-|User|
-repeat
-:Fill in the form;
-:Submit the form;
-|System|
-:Validate form data;
-repeat while (invalid data?)
-if (Same combo of depository & mngAcc exists?) then (yes)
-  :Delete the existing entry;
-endif
-:Add an income record with init type;
-:Display operation result;
-stop
-```
-
-### Description
-
-Transaction entries of a certain depository with transaction date prior than that of depository configuration entry will not be calculated.
-
-### UX State
-
-```puml
-title Modification of Depository
-[*] --> DepositoryInfoLocked
-DepositoryInfoLocked --> DepositoryInfoUnlocked
-DepositoryInfoUnlocked --> DepositoryInfoModified
-DepositoryInfoUnlocked --> DepositoryInfoLocked
-DepositoryInfoModified --> DepositoryInfoLocked
-DepositoryInfoLocked --> [*]
-DepositoryInfoLocked : Contents - void
-```
-
-```puml
-title Creation of Depository
-[*] --> DepositoryInfoUnlocked
-DepositoryInfoUnlocked --> DepositoryInfoCreated
-DepositoryInfoCreated --> DepositoryInfoLocked
-DepositoryInfoLocked --> [*]
-```
-
-```puml
-title Deletion of Depository
-[*] --> DepositoryInfoLocked
-DepositoryInfoLocked --> DepositoryInfoDeleted
-DepositoryInfoDeleted --> [*]
-```
-
-```puml
-title Skeleton Modal State Transition
-[*] --> Empty
-Empty --> PromptNextOrAbort : Attempt Valid
-PromptNextOrAbort --> HintSuccess : Next Action Fulfilled
-HintSuccess --> [*]
-PromptNextOrAbort --> PromptAbort : Next Action Failed
-Empty --> PromptAbort : Attempt Is Not Valid
-PromptAbort --> [*]
-```
-
-```puml
-title Depository Item in Configuration Module
-[*] --> Empty
-[*] --> Read
-Empty --> Edit : add
-Edit --> Read : confirm adding
-Edit --> Empty : abort adding
-Edit --> Read : abort editing
-Edit --> Read : confirm editing
-Read --> Edit : edit
-Read --> Destroyed : delete
-Read --> [*]
-Destroyed --> [*]
-```
 
 ## Analysis
-
-### Activity Flow
-
-### Description
-
-1. Current Balance of Each Depository
-   1. Balance Distribution by Managing Account
-1. Current Balance of Each Managing Account
-   1. Balance Distribution by Depository
-
-### Requirement Mapping
-
----
 
 ### DFD
 
@@ -185,6 +27,8 @@ digraph Context_Diagram{
         enti1 -> proc1 [ label = "Transfer Record" ];
         enti1 -> proc1 [ label = "Depository-Managing Account Configuration" ];
         proc1 -> enti1 [ label = "Balance Distribution" ];
+        proc1 -> enti1 [ label = "Flow Records", color=Red ];
+        enti1 -> proc1 [ label = "Edited Flow Record", color=Red ];
 }
 ```
 
@@ -195,11 +39,12 @@ digraph Diagram_0{
 
 
 
-        ratio="compress"
+        ranksep = 1.5;
         node [ fontsize=12 ];
         edge [ fontsize=10 ];
 
-        enti1 [label="Group of Bookkeepers" shape=box];          
+        enti1 [label="Group of Bookkeepers" shape=box];
+        enti2 [label="Group of Bookkeepers" shape=box];          
 
         subgraph cluster_system{
           proc1 [label=<
@@ -262,6 +107,19 @@ digraph Diagram_0{
               <HR/>
               <tr>
                 <td>Calculate Balance Distribution</td>
+              </tr>
+            </table>
+            >,
+            shape=none
+          ];
+          proc6 [label=<
+            <table style="rounded" CELLBORDER="0" CELLSPACING="4">
+              <tr>
+                <td>6</td>
+              </tr>
+              <HR/>
+              <tr>
+                <td>Check Flow Records</td>
               </tr>
             </table>
             >,
@@ -343,7 +201,14 @@ digraph Diagram_0{
         enti1 -> proc5 [ label = "Query Request" ];
         datastore1 -> proc5 [ label = "Expense Records" ];
         datastore2 -> proc5 [ label = "Income Records" ];
-        proc5 -> enti1 [ label = "Balance Distribution" ];
+        proc5 -> enti2 [ label = "Balance Distribution" ];
+
+        enti1 -> proc6 [ label="Search Criteria" ];
+        datastore1 -> proc6 [ label="Expense Records: expense, transfer" ];
+        datastore2 -> proc6 [ label="Income Records: income, transfer, init excluded" ];
+        datastore3 -> proc6 [ label="Depositories Info" ];
+        datastore4 -> proc6 [ label="Managing Accounts Info" ];
+        proc6 -> enti2 [ label="Matched Flow Records" ];
 }
 ```
 
@@ -769,8 +634,110 @@ digraph digram_5{
 }
 ```
 
-###
+#### Diagram 6
 
+```dot
+digraph digram_6{
+
+  enti1input [label="Group of Bookkeepers" shape=box];
+  enti1output [label="Group of Bookkeepers" shape=box];
+  proc6_1 [label=<
+    <table style="rounded" CELLBORDER="0" CELLSPACING="4">
+      <tr>
+        <td>6.1</td>
+      </tr>
+      <HR/>
+      <tr>
+        <td>Search Matching Records</td>
+      </tr>
+    </table>
+    >,
+    shape=none
+  ];
+  dsIncomeRecord [
+    shape="plain",
+    label=<
+      <table CELLBORDER="0" CELLPADDING="4">
+        <tr>
+          <td></td>
+          <vr/>
+          <td>DS: Income Record</td>
+        </tr>
+      </table>
+    >
+  ];
+  dsExpenseRecord [
+    shape="plain",
+    label=<
+      <table CELLBORDER="0" CELLPADDING="4">
+        <tr>
+          <td></td>
+          <vr/>
+          <td>DS: Expense Record</td>
+        </tr>
+      </table>
+    >
+  ];
+  dsDepositoryInfo [
+    shape="plain",
+    label=<
+      <table CELLBORDER="0" CELLPADDING="4">
+        <tr>
+          <td></td>
+          <vr/>
+          <td>DS: Depository Info</td>
+        </tr>
+      </table>
+    >
+  ];
+  dsManagingAccountInfo [
+    shape="plain",
+    label=<
+      <table CELLBORDER="0" CELLPADDING="4">
+        <tr>
+          <td></td>
+          <vr/>
+          <td>DS: Managing Account Info</td>
+        </tr>
+      </table>
+    >
+  ];
+
+  { rank=source; enti1input;}
+  enti1input -> proc6_1 [ label="Search Criteria" ];
+  dsIncomeRecord -> proc6_1 [ label="Income Records: income, transfer; init excluded" ];
+  dsExpenseRecord -> proc6_1 [ label="Expense Records: expense, transfer" ];
+  dsDepositoryInfo -> proc6_1 [ label="Depository Info: mapped display name" ];
+  dsManagingAccountInfo -> proc6_1 [ label="Managing Account Info: mapped display name" ];
+  proc6_1 -> enti1output [ label="Matched Flow Records" ];
+}
+```
+
+```puml
+title Process 6
+
+left to right direction
+
+rectangle System {
+    (Check Records with Pagination)
+    (Query by issuer; optional: start time, end time, owner)
+    (Filter by depository)
+    (Filter by managing account)
+}
+
+:Bookkeeper:
+:Datastore:
+
+Bookkeeper -- (Check Records with Pagination)
+(Check Records with Pagination) --> (Query by issuer; optional: start time, end time, owner)
+(Filter by depository) ..> (Query by issuer; optional: start time, end time, owner) : extends
+(Filter by managing account) ..> (Query by issuer; optional: start time, end time, owner) : extends
+(Query by issuer; optional: start time, end time, owner) -- :Datastore:
+```
+
+
+
+## Design
 
 ### Datastore Model
 
@@ -858,6 +825,181 @@ Key: ownerId::type
 Indexed view
 editorView of a user
 viewerView of a user
+
+
+
+
+
+
+
+
+## Feature Name
+
+### Activity Flow
+
+### Description
+
+### Requirement Mapping
+
+---
+
+
+## Display Total Expense of This Month
+
+---
+
+## Create An Expense Record
+
+### Main Flow
+
+```puml
+|User|
+start
+:Access expense entry form;
+|System|
+:Display expense entry form;
+|User|
+repeat
+:Fill in the form;
+:Submit the form;
+|System|
+:Validate form data;
+repeat while (invalid data?)
+:Add an expense record;
+:Display operation result;
+stop
+```
+
+---
+
+## Create An Income Record
+
+### Main Flow
+
+```puml
+|User|
+start
+:Access income entry form;
+|System|
+:Display income entry form;
+|User|
+repeat
+:Fill in the form;
+:Submit the form;
+|System|
+:Validate form data;
+repeat while (invalid data?)
+:Add an income record;
+:Display operation result;
+stop
+```
+
+---
+
+## Configure Depository
+
+### Main Flow
+
+```puml
+|User|
+start
+:Access configuration form;
+|System|
+:Display configuration form;
+|User|
+repeat
+:Fill in the form;
+:Submit the form;
+|System|
+:Validate form data;
+repeat while (invalid data?)
+if (Same combo of depository & mngAcc exists?) then (yes)
+  :Delete the existing entry;
+endif
+:Add an income record with init type;
+:Display operation result;
+stop
+```
+
+### Description
+
+Transaction entries of a certain depository with transaction date prior than that of depository configuration entry will not be calculated.
+
+### UX State
+
+```puml
+title Modification of Depository
+[*] --> DepositoryInfoLocked
+DepositoryInfoLocked --> DepositoryInfoUnlocked
+DepositoryInfoUnlocked --> DepositoryInfoModified
+DepositoryInfoUnlocked --> DepositoryInfoLocked
+DepositoryInfoModified --> DepositoryInfoLocked
+DepositoryInfoLocked --> [*]
+DepositoryInfoLocked : Contents - void
+```
+
+```puml
+title Creation of Depository
+[*] --> DepositoryInfoUnlocked
+DepositoryInfoUnlocked --> DepositoryInfoCreated
+DepositoryInfoCreated --> DepositoryInfoLocked
+DepositoryInfoLocked --> [*]
+```
+
+```puml
+title Deletion of Depository
+[*] --> DepositoryInfoLocked
+DepositoryInfoLocked --> DepositoryInfoDeleted
+DepositoryInfoDeleted --> [*]
+```
+
+```puml
+title Skeleton Modal State Transition
+[*] --> Empty
+Empty --> PromptNextOrAbort : Attempt Valid
+PromptNextOrAbort --> HintSuccess : Next Action Fulfilled
+HintSuccess --> [*]
+PromptNextOrAbort --> PromptAbort : Next Action Failed
+Empty --> PromptAbort : Attempt Is Not Valid
+PromptAbort --> [*]
+```
+
+```puml
+title Depository Item in Configuration Module
+[*] --> Empty
+[*] --> Read
+Empty --> Edit : add
+Edit --> Read : confirm adding
+Edit --> Empty : abort adding
+Edit --> Read : abort editing
+Edit --> Read : confirm editing
+Read --> Edit : edit
+Read --> Destroyed : delete
+Read --> [*]
+Destroyed --> [*]
+```
+
+## Analysis
+
+### Activity Flow
+
+### Description
+
+1. Current Balance of Each Depository
+   1. Balance Distribution by Managing Account
+1. Current Balance of Each Managing Account
+   1. Balance Distribution by Depository
+
+### Requirement Mapping
+
+---
+
+
+
+
+
+
+
 
 
 

@@ -7,6 +7,16 @@ var cookieParser = require('cookie-parser')
 var uuidV4 = require('uuid/v4');
 var app = express();
 var config = require("./config/sysConfig");
+var favicon = require('serve-favicon');
+
+// test
+app.use("/", function(req, res, next) {
+  console.log("receive request:");
+  console.log(req.path);
+  next();
+});
+
+app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 app.use(bodyParser.json());
 
@@ -37,7 +47,7 @@ var authenController = require("./controllers/authenticationController");
 
 app.use("/auth", authenRouter); // authentication check and login action will not be blocked by authentication check
 
-app.use("/", authenController.authenticationGuard); // make sure that request passed to the handlers below is sent by an authenticated client
+//app.use("/", authenController.authenticationGuard); // make sure that request passed to the handlers below is sent by an authenticated client
 
 app.use("/flow", flowRouter);
 

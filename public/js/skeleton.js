@@ -203,9 +203,8 @@ define(["./clientUtil"], function(clientUtil) {
 
   return {
     registerNavFunction: function(functionMod) {
-      var navFunctionItem = document.createElement("a");
+      var navFunctionItem = document.createElement("button");
       navFunctionItem.setAttribute("class", "w3-bar-item w3-button");
-      navFunctionItem.setAttribute("href", "#");
       navFunctionItem.textContent = functionMod.getDisplayName();
       navFunctionItem.onclick = function() {
         functionMod.initialize();

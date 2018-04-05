@@ -49,6 +49,19 @@ exports.searchMatchedRecords = async function(startTime, endTime, ownerId, trans
         getCount: getCount
       }
     );
+    matchedRecords.flowRecords = matchedRecords.flowRecords.map((record) => {
+      [record.depoName] = availableDepos.filter((depo) => {
+        return depo.id == record.depo;
+      }).map((matchedDepo) => {
+        return matchedDepo.displayName;
+      });
+      [record.mngAccName] = availableMngAccs.filter((mngAcc) => {
+        return mngAcc.id == record.mngAcc;
+      }).map((matchedMngAcc) => {
+        return matchedMngAcc.displayName;
+      });
+      return record;
+    });
 
   } catch(err) {
     logger.error(err + " <-- err happend; process searchMatchedRecords consumes it and returns default value");

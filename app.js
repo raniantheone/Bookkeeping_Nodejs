@@ -10,11 +10,11 @@ var config = require("./config/sysConfig");
 var favicon = require('serve-favicon');
 
 // test
-app.use("/", function(req, res, next) {
-  console.log("receive request:");
-  console.log(req.path);
-  next();
-});
+// app.use("/", function(req, res, next) {
+//   console.log("receive request:");
+//   console.log(req.path);
+//   next();
+// });
 
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 

@@ -86,7 +86,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
       await refreshServerData(queryPayload);
       this.queryPayload = queryPayload;
       this.currentPage = queryPayload.page;
-      this.totalPages = Math.ceil(serverData.count / queryPayload.entriesPerPage);
+      this.totalPages = Math.ceil(serverData.totalCount / queryPayload.entriesPerPage);
       this.entriesPerPage = queryPayload.entriesPerPage;
       updateRecordsArea(serverData.flowRecords);
       updatePagingAreaIfNecessary(this.currentPage, this.totalPages);
@@ -125,36 +125,49 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     };
     if(!containsCurrentPage) {
       recordsUi.pageNumsArea.innerHTML = "";
-      let pageNum = Math.floor(currentPage / maxBtns) * maxBtns;
+      let baseNum = (Math.ceil(currentPage / maxBtns) - 1) * maxBtns; // the number of prevBtn
       for(var j = 1; j <= maxBtns; j++) {
-        pageNum += j;
+        if(baseNum + j > totalPages) {
+          break;
+        };
         let btn = document.createElement("a");
         btn.setAttribute("class", "w3-button");
-        btn.setAttribute("data-page", pageNum);
-        btn.textContent = pageNum;
+        btn.setAttribute("data-page", baseNum + j);
+        btn.textContent = baseNum + j;
         btn.addEventListener("click", function() {
-          queryControl.moveToSpecifiedPage(pageNum);
+          queryControl.moveToSpecifiedPage(this.dataset.page);
         });
         recordsUi.pageNumsArea.appendChild(btn);
       };
-      // now pageNum is the last page number displayed
+      let endNum = baseNum + j; // the number of nextBtn
 
-      // let prevBtn = recordsUi.pagingArea.querySelector("[name=previousGroupBtn]");
-      // if(currentPage > maxBtns) {
-      //   prevBtn.onclick = queryControl.moveToSpecifiedPage(pageNum - 5);
-      //   prevBtn.style.display = "block";
-      // }else{
-      //   prevBtn.style.display = "none";
-      // };
-      //
-      // let nextBtn = recordsUi.pagingArea.querySelector("[name=nextGroupBtn]");
-      // if(pageNum < totalPages) {
-      //   nextBtn.onclick = queryControl.moveToSpecifiedPage(pageNum + 1);
-      //   nextBtn.style.display = "block";
-      // }else{
-      //   nextBtn.style.display = "none";
-      // };
+      let prevBtn = recordsUi.pagingArea.querySelector("[name=previousGroupBtn]");
+      if(currentPage > maxBtns) {
+        prevBtn.onclick = function() {
+          queryControl.moveToSpecifiedPage(baseNum);
+        };
+        prevBtn.style.display = "block";
+      }else{
+        prevBtn.style.display = "none";
+      };
+
+      let nextBtn = recordsUi.pagingArea.querySelector("[name=nextGroupBtn]");
+      if(endNum < totalPages) {
+        nextBtn.onclick = function() {
+          queryControl.moveToSpecifiedPage(baseNum + maxBtns + 1);
+        };
+        nextBtn.style.display = "block";
+      }else{
+        nextBtn.style.display = "none";
+      };
     };
+    pageBtns.forEach((btn) => {
+      if(+btn.dataset.page == currentPage) {
+        btn.style.border = "solid 1px";
+      }else{
+        btn.style.border = "none";
+      };
+    });
   }
 
   async function getInitializedContentNode(mode) {
@@ -163,7 +176,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
 
     let payload = {
       transIssuer: "trista167@gmail.com", // TODO remove hardcode
-      startTime: "2018-03-01T00:00:00.000Z", // TODO remove hardcode
+      startTime: "2018-02-01T00:00:00.000Z", // TODO remove hardcode
       page: 1,
       entriesPerPage: 10,
       getCount: true

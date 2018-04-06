@@ -57,6 +57,15 @@ define(function() {
         errArr: errValidators,
         allPassed: errValidators.length == 0
       }
+    },
+    getUserFromCookie: function() {
+      var [user] = document.cookie.split(";").filter((kvPairStr) => {
+        return kvPairStr.includes("user=");
+      }).map((matchedStr) => {
+        return decodeURIComponent(matchedStr.split("=")[1]);
+      });
+      console.log(user);
+      return user;
     }
   }
 

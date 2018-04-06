@@ -50,7 +50,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/transfer.htm
 
   async function refreshServerData() {
     try {
-      let res = await clientUtil.ajaxPost("/flow/transfer/getTransferableDepoMngAcc", {	ownerId: "trista167@gmail.com"});
+      let res = await clientUtil.ajaxPost("/flow/transfer/getTransferableDepoMngAcc", {	ownerId: clientUtil.getUserFromCookie()});
       if(res.isSuccess) {
         serverData.depos = res.payload.depos;
         serverData.mngAccs = res.payload.mngAccs;
@@ -289,7 +289,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/transfer.htm
     transferUi.transAmount.addEventListener("keyup", updateSourceAndTargetBalance);
     transferUi.transOKBtn.addEventListener("click", function() {
       let payload = {
-        ownerId: "trista167@gmail.com", // TODO remove hardcode
+        ownerId: clientUtil.getUserFromCookie(), // TODO remove hardcode
         sourceDepo: source.depoId,
         sourceMngAcc: source.mngAccId,
         targetDepo: target.depoId,

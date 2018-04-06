@@ -76,7 +76,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
 
   async function refreshServerData() {
     try {
-      let res = await clientUtil.ajaxPost("/config/currentDepoMngAcc", {	ownerId: "trista167@gmail.com"});
+      let res = await clientUtil.ajaxPost("/config/currentDepoMngAcc", {	ownerId: clientUtil.getUserFromCookie()});
       if(res.isSuccess) {
         serverData.depos = res.payload.depos.sort(function(prev, next) { return prev.displayName.localeCompare(next.displayName); });
         serverData.mngAccs = res.payload.mngAccs.sort(function(prev, next) { return prev.displayName.localeCompare(next.displayName); });
@@ -194,7 +194,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
         confirmBtn.addEventListener("click", function() {
 
           let payload = {
-            ownerId: "trista167@gmail.com", // TODO remove hardcode
+            ownerId: clientUtil.getUserFromCookie(), // TODO remove hardcode
             displayName: displayNameText.value
           };
           let conflictNameValidator = clientUtil.createValidator(
@@ -276,7 +276,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
         let deleteBtn = node.querySelector("[name=deleteBtn]");
         deleteBtn.addEventListener("click", function() {
           let payload = {
-            ownerId: "trista167@gmail.com", // TODO remove hardcode
+            ownerId: clientUtil.getUserFromCookie(), // TODO remove hardcode
             depoId: depoId
           };
 
@@ -358,7 +358,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
         confirmBtn.addEventListener("click", function() {
 
           let payload = {
-            ownerId: "trista167@gmail.com", // TODO remove hardcode
+            ownerId: clientUtil.getUserFromCookie(), // TODO remove hardcode
             displayName: displayNameText.value
           };
           let conflictNameValidator = clientUtil.createValidator(
@@ -440,7 +440,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
         let deleteBtn = node.querySelector("[name=deleteBtn]");
         deleteBtn.addEventListener("click", function() {
           let payload = {
-            ownerId: "trista167@gmail.com", // TODO remove hardcode
+            ownerId: clientUtil.getUserFromCookie(), // TODO remove hardcode
             mngAccId: mngAccId
           };
 
@@ -544,7 +544,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
         confirmBtn.addEventListener("click", function() {
 
           let payload = {
-            ownerId: "trista167@gmail.com", // TODO remove hardcode
+            ownerId: clientUtil.getUserFromCookie(), // TODO remove hardcode
             depoId: depoId,
             mngAccId: mngAccId,
             initAmount: initAmount.value
@@ -637,7 +637,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/configuratio
         deleteBtn.addEventListener("click", function() {
 
           let payload = {
-            ownerId: "trista167@gmail.com", // TODO remove hardcode
+            ownerId: clientUtil.getUserFromCookie(), // TODO remove hardcode
             depoId: depoId,
             mngAccId: mngAccId
           };

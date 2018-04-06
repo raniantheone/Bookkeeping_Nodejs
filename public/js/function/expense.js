@@ -43,7 +43,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html
       transAmount: expenseUi.iptTransAmount.value,
       transDateTime: clientUtil.getDateObjFromDateIpt(expenseUi.iptTransDateTime.value).toISOString(),
       transType: "expense",
-      transIssuer: "trista167@gmail.com", // TODO remove hardcode after auth implementation
+      transIssuer: clientUtil.getUserFromCookie(), // TODO remove hardcode after auth implementation
       depo: expenseUi.selectDepo.value,
       mngAcc: expenseUi.selectMngAcc.value
     };
@@ -113,7 +113,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/expense.html
 
   async function refreshServerData() {
     try {
-      let res = await clientUtil.ajaxPost("/flow/expense/initData", {	ownerId: "trista167@gmail.com"});
+      let res = await clientUtil.ajaxPost("/flow/expense/initData", {	ownerId: clientUtil.getUserFromCookie()});
       if(res.isSuccess) {
         serverData.availCombination = res.payload.availCombination;
         serverData.userPref = res.payload.userPref;

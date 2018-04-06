@@ -31,6 +31,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
 
   async function refreshServerData(payload) {
     try {
+
       let res = await clientUtil.ajaxPost("/records/checkRecords", payload);
       // TODO check if error
       serverData.flowRecords = res.payload.flowRecords;
@@ -44,7 +45,9 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     let now = new Date();
     recordsUi.endDateTime.value = clientUtil.getDateIptStr(now);
     recordsUi.startDateTime.value = clientUtil.getDateIptStr(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
-    // TODO set up event handler to update query
+
+    recordsUi.startDateTime.onchange = queryControl.sendNewQuery;
+    recordsUi.endDateTime.onchange = queryControl.sendNewQuery;
   };
 
   function buildRecordItem(flowRecord, tmplNode) {
@@ -77,31 +80,64 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     return recordItem;
   };
 
+  function getStartTimeStr() {
+    let dateObj = clientUtil.getDateObjFromDateIpt(recordsUi.startDateTime.value);
+    dateObj.setHours(0);
+    dateObj.setMinutes(0);
+    dateObj.setSeconds(0);
+    dateObj.setMilliseconds(0);
+    return dateObj.toISOString();
+  };
+
+  function getEndTimeStr() {
+    let dateObj = clientUtil.getDateObjFromDateIpt(recordsUi.endDateTime.value);
+    dateObj.setHours(23);
+    dateObj.setMinutes(59);
+    dateObj.setSeconds(59);
+    dateObj.setMilliseconds(999);
+    return dateObj.toISOString();
+  };
+
+  let queryState = {
+    queryPayload: null, // only change when query criteria changes, and stays the same if user just move along different pages of the same criteria
+    currentPage: null,
+    totalPages: null,
+    entriesPerPage: null
+  };
+
   let queryControl = {
     queryPayload: null, // only change when query criteria changes, and stays the same if user just move along different pages of the same criteria
     currentPage: null,
     totalPages: null,
     entriesPerPage: null,
-    sendNewQuery: async function(queryPayload) {
+    sendNewQuery: async function() {
+      let queryPayload = {
+        transIssuer: clientUtil.getUserFromCookie(),
+        startTime: getStartTimeStr(),
+        endTime: getEndTimeStr(),
+        page: 1,
+        entriesPerPage: 10,
+        getCount: true
+      }
       await refreshServerData(queryPayload);
-      this.queryPayload = queryPayload;
-      this.currentPage = queryPayload.page;
-      this.totalPages = Math.ceil(serverData.totalCount / queryPayload.entriesPerPage);
-      this.entriesPerPage = queryPayload.entriesPerPage;
+      queryState.queryPayload = queryPayload;
+      queryState.currentPage = queryPayload.page;
+      queryState.totalPages = Math.ceil(serverData.totalCount / queryPayload.entriesPerPage);
+      queryState.entriesPerPage = queryPayload.entriesPerPage;
       updateRecordsArea(serverData.flowRecords);
-      updatePagingAreaIfNecessary(this.currentPage, this.totalPages);
+      updatePagingAreaIfNecessary(queryState.currentPage, queryState.totalPages, true); // force refresh pagination
     },
     moveToSpecifiedPage: async function(page) {
       let pageQuery = {};
-      for(var prop in this.queryPayload) {
-        pageQuery[prop] = this.queryPayload[prop];
+      for(var prop in queryState.queryPayload) {
+        pageQuery[prop] = queryState.queryPayload[prop];
       };
-      this.currentPage = +page;
+      queryState.currentPage = +page;
       pageQuery.page = +page;
       pageQuery.getCount = false;
       await refreshServerData(pageQuery);
       updateRecordsArea(serverData.flowRecords);
-      updatePagingAreaIfNecessary(this.currentPage, this.totalPages);
+      updatePagingAreaIfNecessary(queryState.currentPage, queryState.totalPages);
     }
   };
 
@@ -113,7 +149,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     });
   }
 
-  function updatePagingAreaIfNecessary(currentPage, totalPages) {
+  function updatePagingAreaIfNecessary(currentPage, totalPages, forceRefresh = false) {
     let maxBtns = 5;
     let pageBtns = recordsUi.pageNumsArea.childNodes;
     let containsCurrentPage = false;
@@ -123,7 +159,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
         break;
       };
     };
-    if(!containsCurrentPage) {
+    if(!containsCurrentPage || forceRefresh) {
       recordsUi.pageNumsArea.innerHTML = "";
       let baseNum = (Math.ceil(currentPage / maxBtns) - 1) * maxBtns; // the number of prevBtn
       for(var j = 1; j <= maxBtns; j++) {
@@ -174,14 +210,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     refreshrecordsUi();
     setupQueryDatesIpt();
 
-    let payload = {
-      transIssuer: "trista167@gmail.com", // TODO remove hardcode
-      startTime: "2018-02-01T00:00:00.000Z", // TODO remove hardcode
-      page: 1,
-      entriesPerPage: 10,
-      getCount: true
-    };
-    await queryControl.sendNewQuery(payload);
+    await queryControl.sendNewQuery();
 
     return recordsUi.contentNode;
   };

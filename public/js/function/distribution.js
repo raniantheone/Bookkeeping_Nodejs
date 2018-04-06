@@ -40,7 +40,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
 
   async function refreshServerData() {
     try {
-      let res = await clientUtil.ajaxPost("/analysis/balanceDistribution", {	ownerId: "trista167@gmail.com"}); // TODO remove hardcode
+      let res = await clientUtil.ajaxPost("/analysis/balanceDistribution", {	ownerId: clientUtil.getUserFromCookie()}); // TODO remove hardcode
       if(res.isSuccess) {
         serverData.depos = res.payload.depos;
         serverData.mngAccs = res.payload.mngAccs;

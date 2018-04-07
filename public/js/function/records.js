@@ -46,8 +46,12 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     recordsUi.endDateTime.value = clientUtil.getDateIptStr(now);
     recordsUi.startDateTime.value = clientUtil.getDateIptStr(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
 
-    recordsUi.startDateTime.onchange = queryControl.sendNewQuery;
-    recordsUi.endDateTime.onchange = queryControl.sendNewQuery;
+    recordsUi.startDateTime.onchange = function() {
+      queryControl.sendNewQuery.apply(queryControl);
+    };
+    recordsUi.endDateTime.onchange = function() {
+      queryControl.sendNewQuery.apply(queryControl);
+    };
   };
 
   function buildRecordItem(flowRecord, tmplNode) {
@@ -98,18 +102,12 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     return dateObj.toISOString();
   };
 
-  let queryState = {
-    queryPayload: null, // only change when query criteria changes, and stays the same if user just move along different pages of the same criteria
-    currentPage: null,
-    totalPages: null,
-    entriesPerPage: null
-  };
-
   let queryControl = {
-    queryPayload: null, // only change when query criteria changes, and stays the same if user just move along different pages of the same criteria
+    queryPayload: null, // only change when query criteria changes, and stays the same if user just moves along different pages of the same criteria
     currentPage: null,
     totalPages: null,
     entriesPerPage: null,
+    identifier: "testId",
     sendNewQuery: async function() {
       let queryPayload = {
         transIssuer: clientUtil.getUserFromCookie(),
@@ -120,24 +118,24 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
         getCount: true
       }
       await refreshServerData(queryPayload);
-      queryState.queryPayload = queryPayload;
-      queryState.currentPage = queryPayload.page;
-      queryState.totalPages = Math.ceil(serverData.totalCount / queryPayload.entriesPerPage);
-      queryState.entriesPerPage = queryPayload.entriesPerPage;
+      this.queryPayload = queryPayload;
+      this.currentPage = queryPayload.page;
+      this.totalPages = Math.ceil(serverData.totalCount / queryPayload.entriesPerPage);
+      this.entriesPerPage = queryPayload.entriesPerPage;
       updateRecordsArea(serverData.flowRecords);
-      updatePagingAreaIfNecessary(queryState.currentPage, queryState.totalPages, true); // force refresh pagination
+      updatePagingAreaIfNecessary(this.currentPage, this.totalPages, true); // force refresh pagination
     },
     moveToSpecifiedPage: async function(page) {
       let pageQuery = {};
-      for(var prop in queryState.queryPayload) {
-        pageQuery[prop] = queryState.queryPayload[prop];
+      for(var prop in this.queryPayload) {
+        pageQuery[prop] = this.queryPayload[prop];
       };
-      queryState.currentPage = +page;
+      this.currentPage = +page;
       pageQuery.page = +page;
       pageQuery.getCount = false;
       await refreshServerData(pageQuery);
       updateRecordsArea(serverData.flowRecords);
-      updatePagingAreaIfNecessary(queryState.currentPage, queryState.totalPages);
+      updatePagingAreaIfNecessary(this.currentPage, this.totalPages);
     }
   };
 
@@ -175,7 +173,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
         });
         recordsUi.pageNumsArea.appendChild(btn);
       };
-      let endNum = baseNum + j; // the number of nextBtn
+      let endNum = baseNum + j; // the number of last numbered button
 
       let prevBtn = recordsUi.pagingArea.querySelector("[name=previousGroupBtn]");
       if(currentPage > maxBtns) {

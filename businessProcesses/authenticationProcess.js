@@ -13,7 +13,7 @@ exports.isValidUser = async function(ownerId, password) {
   let isValid = false;
   try {
     let user = await datastoreSvc.queryExistingUser(ownerId);
-    isValid = user && password == user.password; // TODO hash
+    isValid = user && hashUtil.simpleHash(password) == user.password;
   } catch(err) {
     console.log(err + " <-- happened, authenProcess consumed the error and returned default value");
   };

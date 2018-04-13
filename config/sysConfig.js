@@ -15,7 +15,7 @@ let config = buildConfigComponent();
 
 config.env = env;
 config.test = "test from default";
-config.authenMaxAgeSec = 7200;
+config.authenMaxAgeSec = 30 * 60;
 
 config.couchbase.errorCode.noSuchKey = 13;
 

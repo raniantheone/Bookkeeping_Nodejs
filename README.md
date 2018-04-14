@@ -14,6 +14,8 @@ The goal of v1.0.0 is about keeping records of money flow, querying them, as wel
 2. Delete record
 3. Promotion/Manual page
 
+The analysis and design of this project is documented in SAD.md under project root folder. It is written with an awesome Atom package called [markdown-preview-enhanced](https://atom.io/packages/markdown-preview-enhanced). The HTML version is enclosed as well.
+
 ## Future Roadmap
 - v2.0.0
  1. Collaborate with other user

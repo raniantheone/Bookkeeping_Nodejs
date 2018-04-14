@@ -18,6 +18,9 @@ config.test = "test from default";
 config.authenMaxAgeSec = 30 * 60;
 
 config.couchbase.errorCode.noSuchKey = 13;
+config.couchbase.bucket.name = "bookkeeping";
+config.couchbase.bucket.acc = "Administrator";
+config.couchbase.bucket.pwd = "password";
 
 
 // override default with env specific key-value

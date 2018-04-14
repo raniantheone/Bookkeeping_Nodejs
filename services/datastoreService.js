@@ -1,17 +1,18 @@
 var cls = require('cls-hooked');
 let logUtil = require("../utils/customLogger");
 let logger = logUtil.logger;
+let config = require("../config/sysConfig");
 let couchbase = require('couchbase');
 let cluster = new couchbase.Cluster('couchbase://localhost/');
-cluster.authenticate('Administrator', 'password');
-let bucket = cluster.openBucket('bookkeeping');
-let config = require("../config/sysConfig");
+cluster.authenticate(config.couchbase.bucket.acc, config.couchbase.bucket.pwd);
+let bucket = cluster.openBucket(config.couchbase.bucket.name);
+
 
 
 exports.queryDepoMngAccAndPreselect = async function(ownerId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE CONTAINS(META(bookkeeping).id, $1) OR CONTAINS(META(bookkeeping).id, $2) OR CONTAINS(META(bookkeeping).id, $3)");
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE CONTAINS(META(" + config.couchbase.bucket.name + ").id, $1) OR CONTAINS(META(" + config.couchbase.bucket.name + ").id, $2) OR CONTAINS(META(" + config.couchbase.bucket.name + ").id, $3)");
     bucket.query(
       queryStr,
       [ownerId + "::depo", ownerId + "::mngAcc",  ownerId + "::user"],
@@ -43,7 +44,7 @@ exports.insertExpenseRecord = async function(expenseRecord) {
 exports.saveUserPrefs = async function(ownerId, prefs) {
 
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT prefs FROM `bookkeeping` WHERE META().id = $1");
+    let queryStr = N1qlQuery.fromString("SELECT prefs FROM `" + config.couchbase.bucket.name + "` WHERE META().id = $1");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     let userPref = await new Promise((resolve, reject) => {
       bucket.query(
@@ -71,7 +72,7 @@ exports.saveUserPrefs = async function(ownerId, prefs) {
         userPref[key] = pref[key];
     })
 
-    let updateStr = N1qlQuery.fromString("UPDATE `bookkeeping` SET prefs = $2 WHERE META().id = $1 RETURNING *;");
+    let updateStr = N1qlQuery.fromString("UPDATE `" + config.couchbase.bucket.name + "` SET prefs = $2 WHERE META().id = $1 RETURNING *;");
     updateStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     let updateResult = await new Promise((resolve, reject) => {
       bucket.query(
@@ -97,7 +98,7 @@ exports.saveUserPrefs = async function(ownerId, prefs) {
 exports.queryExpenseTransTypes = async function() {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT expenseTypes FROM `bookkeeping` WHERE META().id = 'system::config'");
+    let queryStr = N1qlQuery.fromString("SELECT expenseTypes FROM `" + config.couchbase.bucket.name + "` WHERE META().id = 'system::config'");
     bucket.query(
       queryStr,
       (err, res) => {
@@ -117,7 +118,7 @@ exports.queryExpenseTransTypes = async function() {
 exports.queryAvailableDepos = async function(transIssuer) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE type = 'depo' AND (ownerId = $1 OR ARRAY_CONTAINS(editorIds, $1) );");
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE type = 'depo' AND (ownerId = $1 OR ARRAY_CONTAINS(editorIds, $1) );");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
@@ -140,7 +141,7 @@ exports.queryAvailableDepos = async function(transIssuer) {
 exports.queryAvailableMngAccs = async function(transIssuer) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE type = 'mngAcc' AND (ownerId = $1 OR ARRAY_CONTAINS(editorIds, $1) );");
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE type = 'mngAcc' AND (ownerId = $1 OR ARRAY_CONTAINS(editorIds, $1) );");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
@@ -191,7 +192,7 @@ exports.queryExistingUser = async function(ownerId) {
 exports.queryDepoMngAccWithInitValue = async function(ownerId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND (type = 'mngAcc' OR type = 'depo' OR (type = 'income' AND transType = 'init'));");
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE ownerId = $1 AND (type = 'mngAcc' OR type = 'depo' OR (type = 'income' AND transType = 'init'));");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
@@ -261,7 +262,7 @@ exports.createDepo = async function(depo) {
 exports.updateDepoName = async function(ownerId, depoId, displayName) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("UPDATE `bookkeeping` SET displayName = $1 WHERE type = 'depo' AND id = $2 AND ownerId = $3;");
+    let queryStr = N1qlQuery.fromString("UPDATE `" + config.couchbase.bucket.name + "` SET displayName = $1 WHERE type = 'depo' AND id = $2 AND ownerId = $3;");
     bucket.query(
       queryStr,
       [displayName, depoId, ownerId],
@@ -280,7 +281,7 @@ exports.updateDepoName = async function(ownerId, depoId, displayName) {
 exports.delDepo = async function(ownerId, depoId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("DELETE FROM `bookkeeping` WHERE ownerId = $1 AND type = 'depo' AND id = $2;");
+    let queryStr = N1qlQuery.fromString("DELETE FROM `" + config.couchbase.bucket.name + "` WHERE ownerId = $1 AND type = 'depo' AND id = $2;");
     bucket.query(
       queryStr,
       [ownerId, depoId],
@@ -347,7 +348,7 @@ exports.queryMngAccById = async function(mngAccId) {
 exports.updateMngAccName = async function(ownerId, mngAccId, displayName) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("UPDATE `bookkeeping` SET displayName = $1 WHERE type = 'mngAcc' AND id = $2 AND ownerId = $3 RETURNING *;");
+    let queryStr = N1qlQuery.fromString("UPDATE `" + config.couchbase.bucket.name + "` SET displayName = $1 WHERE type = 'mngAcc' AND id = $2 AND ownerId = $3 RETURNING *;");
     bucket.query(
       queryStr,
       [displayName, mngAccId, ownerId],
@@ -373,7 +374,7 @@ exports.updateMngAccName = async function(ownerId, mngAccId, displayName) {
 exports.delMngAcc = async function(ownerId, mngAccId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("DELETE FROM `bookkeeping` WHERE ownerId = $1 AND type = 'mngAcc' AND id = $2  RETURNING *;");
+    let queryStr = N1qlQuery.fromString("DELETE FROM `" + config.couchbase.bucket.name + "` WHERE ownerId = $1 AND type = 'mngAcc' AND id = $2  RETURNING *;");
     bucket.query(
       queryStr,
       [ownerId, mngAccId],
@@ -400,7 +401,7 @@ exports.delMngAcc = async function(ownerId, mngAccId) {
 exports.deleteInitRecord = async function(ownerId, depoId, mngAccId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("DELETE FROM `bookkeeping` WHERE ownerId = $1 AND type = 'income' AND transType = 'init' AND depo = $2 AND mngAcc = $3  RETURNING *;");
+    let queryStr = N1qlQuery.fromString("DELETE FROM `" + config.couchbase.bucket.name + "` WHERE ownerId = $1 AND type = 'income' AND transType = 'init' AND depo = $2 AND mngAcc = $3  RETURNING *;");
     bucket.query(
       queryStr,
       [ownerId, depoId, mngAccId],
@@ -459,7 +460,7 @@ exports.querySystemConfig = async function() {
 exports.queryInitIncomeRecord = async function(ownerId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND type = 'income' AND transType = 'init';");
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE ownerId = $1 AND type = 'income' AND transType = 'init';");
     bucket.query(
       queryStr,
       [ownerId],
@@ -483,7 +484,7 @@ exports.queryInitIncomeRecord = async function(ownerId) {
 exports.queryDepoMngAccBalanceParts = async function(depoId, mngAccId, initDateTime) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT type, transType, SUM(transAmount) as total FROM `bookkeeping` WHERE ((type = 'income' AND transType = 'init') OR (type = 'income' AND transType = 'income' AND transDateTime >= $3) OR (type = 'income' AND transType = 'transfer' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'expense' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'transfer' AND transDateTime >= $3)) AND (depo = $1 AND mngAcc = $2) GROUP BY type, transType;");
+    let queryStr = N1qlQuery.fromString("SELECT type, transType, SUM(transAmount) as total FROM `" + config.couchbase.bucket.name + "` WHERE ((type = 'income' AND transType = 'init') OR (type = 'income' AND transType = 'income' AND transDateTime >= $3) OR (type = 'income' AND transType = 'transfer' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'expense' AND transDateTime >= $3) OR (type = 'expense' AND transType = 'transfer' AND transDateTime >= $3)) AND (depo = $1 AND mngAcc = $2) GROUP BY type, transType;");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr,
@@ -542,7 +543,7 @@ exports.insertUser = async function(user) {
 exports.queryTransferRecords = async function(ownerId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND (type = 'income' OR type = 'expense') AND transType = 'transfer';");
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE ownerId = $1 AND (type = 'income' OR type = 'expense') AND transType = 'transfer';");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr
@@ -565,7 +566,7 @@ exports.queryTransferRecords = async function(ownerId) {
 exports.queryFlowRecordByOwnerId = async function(ownerId) {
   return new Promise((resolve, reject) => {
     let N1qlQuery = couchbase.N1qlQuery;
-    let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE ownerId = $1 AND (type = 'income' OR type = 'expense');");
+    let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE ownerId = $1 AND (type = 'income' OR type = 'expense');");
     queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
     bucket.query(
       queryStr
@@ -666,7 +667,7 @@ exports.queryFlowRecord = async function(startTime, endTime, ownerId, issuerId, 
   };
 
   let N1qlQuery = couchbase.N1qlQuery;
-  let queryStr = N1qlQuery.fromString("SELECT * FROM `bookkeeping` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + availDepoIdsClause + availMngAccIdsClause + startTimeClause + endTimeClause + " ORDER BY transDateTime DESC" + paginationClause);
+  let queryStr = N1qlQuery.fromString("SELECT * FROM `" + config.couchbase.bucket.name + "` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + availDepoIdsClause + availMngAccIdsClause + startTimeClause + endTimeClause + " ORDER BY transDateTime DESC" + paginationClause);
   queryStr.consistency(N1qlQuery.Consistency.REQUEST_PLUS);
 
   queryResult.flowRecords = await new Promise((resolve, reject) => {
@@ -691,7 +692,7 @@ exports.queryFlowRecord = async function(startTime, endTime, ownerId, issuerId, 
   });
 
   if(pagination.getCount) {
-    let queryStr = N1qlQuery.fromString("SELECT COUNT(itemName) AS count FROM `bookkeeping` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + availDepoIdsClause + availMngAccIdsClause + startTimeClause + endTimeClause);
+    let queryStr = N1qlQuery.fromString("SELECT COUNT(itemName) AS count FROM `" + config.couchbase.bucket.name + "` WHERE (transIssuer = $4 " + ownerIdClause + ") AND ((type = 'income' OR type = 'expense') AND transType != 'init')" + availDepoIdsClause + availMngAccIdsClause + startTimeClause + endTimeClause);
     queryResult.count = await new Promise((resolve, reject) => {
       bucket.query(
         queryStr,

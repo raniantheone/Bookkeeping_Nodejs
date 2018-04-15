@@ -125,7 +125,7 @@ exports.queryAvailableDepos = async function(transIssuer) {
       [transIssuer],
       (err, res) => {
         if (!err) {
-          res = res.map((entry) => { return entry.bookkeeping });
+          res = res.map((entry) => { return entry[config.couchbase.bucket.name] });
           console.log("Query available depos successfully. Depos are");
           console.log(res);
           resolve(res);
@@ -148,7 +148,7 @@ exports.queryAvailableMngAccs = async function(transIssuer) {
       [transIssuer],
       (err, res) => {
         if (!err) {
-          res = res.map((entry) => { return entry.bookkeeping });
+          res = res.map((entry) => { return entry[config.couchbase.bucket.name] });
           console.log("Query available mngAcc successfully. MngAccs are");
           console.log(res);
           resolve(res);
@@ -199,7 +199,7 @@ exports.queryDepoMngAccWithInitValue = async function(ownerId) {
       [ownerId],
       (err, res) => {
         if (!err) {
-          res = res.map((entry) => { return entry.bookkeeping });
+          res = res.map((entry) => { return entry[config.couchbase.bucket.name] });
           console.log("Query available depo, mngAcc, initValue successfully. Entries are");
           console.log(res);
           resolve(res);
@@ -467,7 +467,7 @@ exports.queryInitIncomeRecord = async function(ownerId) {
       (err, res) => {
         if (!err) {
           res = res.map((entry) => {
-            return entry.bookkeeping;
+            return entry[config.couchbase.bucket.name];
           });
           console.log("query init income record successfully");
           console.log(res);
@@ -550,7 +550,7 @@ exports.queryTransferRecords = async function(ownerId) {
       , [ownerId]
       , (err, res) => {
         if (!err) {
-          res = res.map((entry) => { return entry.bookkeeping });
+          res = res.map((entry) => { return entry[config.couchbase.bucket.name] });
           console.log("query transfer records of %s successfully", ownerId);
           console.log(res);
           resolve(res);
@@ -573,7 +573,7 @@ exports.queryFlowRecordByOwnerId = async function(ownerId) {
       , [ownerId]
       , (err, res) => {
         if (!err) {
-          res = res.map((entry) => { return entry.bookkeeping });
+          res = res.map((entry) => { return entry[config.couchbase.bucket.name] });
           console.log("query flow records of %s successfully", ownerId);
           console.log(res);
           resolve(res);
@@ -683,7 +683,7 @@ exports.queryFlowRecord = async function(startTime, endTime, ownerId, issuerId, 
       }
     );
   }).then((res) => {
-    res = res.map((entry) => { return entry.bookkeeping });
+    res = res.map((entry) => { return entry[config.couchbase.bucket.name] });
     logger.debug(res);
     return res;
   }).catch((err) => {

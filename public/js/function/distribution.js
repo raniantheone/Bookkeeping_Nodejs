@@ -40,7 +40,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
 
   async function refreshServerData() {
     try {
-      let res = await clientUtil.ajaxPost("/analysis/balanceDistribution", {	ownerId: clientUtil.getUserFromCookie()}); // TODO remove hardcode
+      let res = await clientUtil.ajaxPost("/analysis/balanceDistribution", {	ownerId: clientUtil.getUserFromCookie()});
       if(res.isSuccess) {
         serverData.depos = res.payload.depos;
         serverData.mngAccs = res.payload.mngAccs;
@@ -97,7 +97,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     depoDistro.depoNodeRepresentation.addEventListener("click", function() {
       let listIsHidden = depoDistro.listNodeRepresentation.style.display == "none";
       depoDistro.listNodeRepresentation.style.display = listIsHidden ? "block" : "none";
-      depoDistro.depoNodeRepresentation.querySelector("[name=toggleArrow]").innerHTML = listIsHidden ? "&#9650;" : "&#9660;";
+      depoDistro.depoNodeRepresentation.querySelector("[name=toggleArrow]").innerHTML = listIsHidden ? "<i class='fas fa-caret-square-up'></i>" : "<i class='fas fa-caret-square-down'></i>";
     });
     return depoDistro;
   };
@@ -132,7 +132,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
     mngAccDistro.mngAccNodeRepresentation.addEventListener("click", function() {
       let listIsHidden = mngAccDistro.listNodeRepresentation.style.display == "none";
       mngAccDistro.listNodeRepresentation.style.display = listIsHidden ? "block" : "none";
-      mngAccDistro.mngAccNodeRepresentation.querySelector("[name=toggleArrow]").innerHTML = listIsHidden ? "&#9650;" : "&#9660;";
+      mngAccDistro.mngAccNodeRepresentation.querySelector("[name=toggleArrow]").innerHTML = listIsHidden ? "<i class='fas fa-caret-square-up'></i>" : "<i class='fas fa-caret-square-down'></i>";
     });
     return mngAccDistro;
   };

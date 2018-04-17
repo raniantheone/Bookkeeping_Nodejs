@@ -31,7 +31,7 @@ async function getInitDepoMngAccWithBalance(ownerId) {
       }else if(entry.type == "mngAcc") {
         result.mngAccs.push(entry);
       }
-      return entry.type == "income";
+      return entry.type == "income" && entry.depo.includes(ownerId); // scenario: combo initiated by collaborated cannot be transfer candidate of owner
     });
 
     // calculate balance of each init entry

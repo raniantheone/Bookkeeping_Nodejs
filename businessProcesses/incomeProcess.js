@@ -134,6 +134,9 @@ exports.getInitDepoMngAccAndPref = async function(ownerId) {
       }else if(entry.type == "mngAcc") {
         mngAccMap[ entry.id ] = entry.displayName;
       }else if(entry.type == "income" && entry.transType == "init") {
+        if(!entry.depo.includes(ownerId)) {
+          continue; // scenario: a collaborator used the combo of his/her depository and owner's managing account
+        };
         var combo = {
           depoId: entry.depo,
           depoDisplayName: null,

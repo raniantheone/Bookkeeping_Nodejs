@@ -54,9 +54,10 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/distribution
   };
 
   function getDepoDisplayName(depoId) {
-    let [{displayName:name}] = serverData.depos.filter((depo) => {
+    let [matchedDepo] = serverData.depos.filter((depo) => {
       return depo.id == depoId;
     });
+    let name = matchedDepo ? matchedDepo.displayName : "Collaborator's Depository";
     return name;
   };
 

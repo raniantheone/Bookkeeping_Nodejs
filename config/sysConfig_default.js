@@ -1,7 +1,7 @@
 let configBuilder = require("./configBuilder");
 let config = configBuilder.buildConfigComponent();
 
-config.authenMaxAgeSec = 30 * 60;
+config.authenMaxAgeSec = 24 * 60 * 60;
 config.usePort = 3000;
 
 config.couchbase.errorCode.noSuchKey = 13;

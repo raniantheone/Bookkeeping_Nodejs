@@ -28,7 +28,7 @@ require(["clientUtil", "skeleton", "function/expense", "function/income", "funct
       /**
       * Initialize default function content
       */
-      recordsMod.initialize();
+      expenseMod.initialize();
       skeletonMod.showFunctionHeaderBar();
 
     };

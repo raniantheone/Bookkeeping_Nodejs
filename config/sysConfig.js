@@ -1,4 +1,4 @@
-let env = process.env.ENV || "dev";
+let env = process.env.NODE_ENV || "development";
 let envSpecificConfig = require("./sysConfig_" + env);
 if(!envSpecificConfig) {
   envSpecificConfig = require("./sysConfig_default");

@@ -16,6 +16,16 @@ The goal of v1.0.0 is about keeping records of money flow, querying them, as wel
 
 The analysis and design of this project is documented in SAD.md under project root folder. It is written with an awesome Atom package called [markdown-preview-enhanced](https://atom.io/packages/markdown-preview-enhanced). The HTML version is enclosed as well.
 
+### A Glimpse of What's Going On
+
+![Distribution Summary](https://i.imgur.com/Gw5el8C.png?1)
+
+![Flow Records](https://i.imgur.com/YIlCL10.png?1)
+
+![Keep Expense](https://i.imgur.com/W85OdCg.png?1)
+
+![Transfer](https://i.imgur.com/XoBots2.png?1)
+
 ## Future Roadmap
 - v2.0.0
  1. Collaborate with other user

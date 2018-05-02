@@ -26,6 +26,9 @@ app.use(cookieParser());
 
 app.use("/bookkeeping", express.static(path.join(__dirname, 'public')));
 
+app.enable('trust proxy');
+console.log(app.enabled('trust proxy'));
+
 app.use("/", function(req, res, next) {
   var testReqScope = cls.getNamespace("testReqScope");
   testReqScope.bindEmitter(req);
@@ -33,7 +36,7 @@ app.use("/", function(req, res, next) {
   testReqScope.run(function() {
     var reqId = uuidV4().split("-")[0];
     testReqScope.set("reqId", reqId);
-    console.log("request id %s set for %s", reqId, req.path);
+    console.log("request id %s set for %s, request is from %s, ip array is %s", reqId, req.path, JSON.stringify(req.ip), JSON.stringify(req.ips));
     next();
   });
 });
@@ -47,7 +50,7 @@ var authenController = require("./controllers/authenticationController");
 
 app.use("/auth", authenRouter); // authentication check and login action will not be blocked by authentication check
 
-//app.use("/", authenController.authenticationGuard); // make sure that request passed to the handlers below is sent by an authenticated client
+app.use("/", authenController.authenticationGuard); // make sure that request passed to the handlers below is sent by an authenticated client
 
 app.use("/flow", flowRouter);
 
@@ -57,4 +60,4 @@ app.use("/analysis", analysisRouter);
 
 app.use("/records", recordsRouther);
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'));
+app.listen(config.usePort, () => console.log('Example app listening on port' + config.usePort));

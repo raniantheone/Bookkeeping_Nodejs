@@ -31,7 +31,7 @@ async function getInitDepoMngAccWithBalance(ownerId) {
       }else if(entry.type == "mngAcc") {
         result.mngAccs.push(entry);
       }
-      return entry.type == "income";
+      return entry.type == "income" && entry.depo.includes(ownerId); // scenario: combo initiated by collaborated cannot be transfer candidate of owner
     });
 
     // calculate balance of each init entry
@@ -109,8 +109,8 @@ exports.transferFromSourceToTarget = async function(ownerId, sourceDepoId, sourc
       ownerId
       , []
       , []
-      , "transfer to " + depos.filter((depo) => { return depo.id == targetDepoId; }).reduce((res) => { return res.displayName; }) + " - " + mngAccs.filter((mngAcc) => { return mngAcc.id == targetMngAccId; }).reduce((res) => { return res.displayName })
       , "transfer"
+      , "send to " + depos.filter((depo) => { return depo.id == targetDepoId; })[0]["displayName"] + " - " + mngAccs.filter((mngAcc) => { return mngAcc.id == targetMngAccId; })[0]["displayName"]
       , transAmount
       , new Date()
       , "transfer"
@@ -124,8 +124,8 @@ exports.transferFromSourceToTarget = async function(ownerId, sourceDepoId, sourc
       ownerId
       , []
       , []
-      , "transfer from " + depos.filter((depo) => { return depo.id == sourceDepoId; }).reduce((res) => { return res.displayName; }) + " - " + mngAccs.filter((mngAcc) => { return mngAcc.id == sourceMngAccId; }).reduce((res) => { return res.displayName })
       , "transfer"
+      , "receive from " + depos.filter((depo) => { return depo.id == sourceDepoId; })[0]["displayName"] + " - " + mngAccs.filter((mngAcc) => { return mngAcc.id == sourceMngAccId; })[0]["displayName"]
       , transAmount
       , new Date()
       , "transfer"

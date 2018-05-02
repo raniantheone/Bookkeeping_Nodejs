@@ -737,6 +737,20 @@ Bookkeeper -- (Check Records with Pagination)
 
 
 
+### Collaboration
+
+1. [o] My Depo, My MngAcc
+  This is the use case of single user. Keeping records according to his/her plan.
+2. [o] My Depo, Other's MngAcc
+  Collaborate with other person. This is keeping records under other person's plan. Normally current bookkeeper will have access to other person's depo combo with a binded shared MngAcc. For example, my wife shares with me the cash envelope which is used for living expense. I then took 100 from that envelope and put the money in my wallet, and spent that 100 for some house utility tools. This use case requires that I have access to combo of cash_envelope - living_expense (of my wife), and a combo that I create with my_wallet - living_expense (of my wife...when combo is composed of different owner, the owner of MngAcc has the ownership of records under this combo).
+3. [x] Other's Depo, My MngAcc
+  This is abusing of other's depo, because record like this means I am using money in other people's depository with whatever my purpose is. Therefore this is not allowed.
+4. [o] Other's Depo, Other's MngAcc...from the same person
+  Collaborate with other person. Record like this means I am using money in his/her depo for the exact purpose he/she planned.
+5. [x] Other's Depo, Other's MngAcc...from differnet person
+  This is me abusing both party. A record like this means I am using money in A's depository for B's planned purpose, while A and B might not even know each other. Therefore this is not allowed.
+
+
 ## Design
 
 ### Datastore Model

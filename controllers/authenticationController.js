@@ -16,7 +16,9 @@ exports.authenticationGuard = async function(req, res, next) {
   if(Object.keys(cookies).length > 0 && cookies.accessToken && cookies.user) {
     let isValid = await authenProc.checkAccessData(cookies.accessToken, cookies.user);
     if(isValid) {
-      next(); // TODO refresh client cookie expiration
+      res.cookie("accessToken", cookies.accessToken, { maxAge: config.authenMaxAgeSec * 1000 });
+      res.cookie("user", cookies.user, { maxAge: config.authenMaxAgeSec * 1000 });
+      next();
       return;
     }
   };

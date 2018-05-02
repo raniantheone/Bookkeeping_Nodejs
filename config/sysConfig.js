@@ -1,32 +1,10 @@
-let env = process.env.ENV || "dev";
-
-// default config
-function buildConfigComponent() {
-  return new Proxy({}, {
-    get: function(target, property, receiver) {
-      if(target[property] == undefined) {
-        target[property] = buildConfigComponent();
-      };
-      return Reflect.get(target, property);
-    }
-  });
-};
-let config = buildConfigComponent();
-
-config.env = env;
-config.test = "test from default";
-config.authenMaxAgeSec = 7200;
-
-config.couchbase.errorCode.noSuchKey = 13;
-
-
-// override default with env specific key-value
+let env = process.env.NODE_ENV || "development";
 let envSpecificConfig = require("./sysConfig_" + env);
-if(envSpecificConfig) {
-  for(var speProp in envSpecificConfig) {
-    config[speProp] = envSpecificConfig[speProp];
-  }
+if(!envSpecificConfig) {
+  envSpecificConfig = require("./sysConfig_default");
 };
-console.log(config);
 
-module.exports = config;
+envSpecificConfig.env = env;
+console.log(envSpecificConfig);
+
+module.exports = envSpecificConfig;

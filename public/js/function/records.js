@@ -47,12 +47,24 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
     recordsUi.startDateTime.value = clientUtil.getDateIptStr(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
 
     recordsUi.startDateTime.onchange = function() {
+      switchStartEndIfNeccessary();
       queryControl.sendNewQuery.apply(queryControl);
     };
     recordsUi.endDateTime.onchange = function() {
+      switchStartEndIfNeccessary();
       queryControl.sendNewQuery.apply(queryControl);
     };
   };
+
+  function switchStartEndIfNeccessary() {
+    let startTime = clientUtil.getDateObjFromDateIpt(recordsUi.startDateTime.value).getTime();
+    let endTime = clientUtil.getDateObjFromDateIpt(recordsUi.endDateTime.value).getTime();
+    if(startTime > endTime) {
+      let tmp = recordsUi.endDateTime.value;
+      recordsUi.endDateTime.value = recordsUi.startDateTime.value;
+      recordsUi.startDateTime.value = tmp;
+    };
+  }
 
   function buildRecordItem(flowRecord, tmplNode) {
     let recordItem = {
@@ -67,7 +79,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
       nodeRepresentation: tmplNode
     };
     recordItem.nodeRepresentation.querySelector("[name=transDateTime]").textContent = recordItem.transDate;
-    recordItem.nodeRepresentation.querySelector("[name=amount]").textContent = recordItem.transAmount;
+    recordItem.nodeRepresentation.querySelector("[name=amount]").textContent = (flowRecord.type == "expense" ? "- " : "+ ") + recordItem.transAmount;
     recordItem.nodeRepresentation.querySelector("[name=transType]").textContent = recordItem.transType;
     recordItem.nodeRepresentation.querySelector("[name=depo]").textContent = recordItem.depoName;
     recordItem.nodeRepresentation.querySelector("[name=mngAcc]").textContent = recordItem.mngAccName;
@@ -173,7 +185,7 @@ define(["../clientUtil", "../skeleton", "text!../../functionSnippet/records.html
         });
         recordsUi.pageNumsArea.appendChild(btn);
       };
-      let endNum = baseNum + j; // the number of last numbered button
+      let endNum = baseNum + j - 1; // the number of last numbered button
 
       let prevBtn = recordsUi.pagingArea.querySelector("[name=previousGroupBtn]");
       if(currentPage > maxBtns) {

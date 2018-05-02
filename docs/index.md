@@ -8,4 +8,4 @@ The pages site of this project is used to keep notes of my workflow described be
 1. [Develop](https://raniantheone.github.io/Bookkeeping_Nodejs/develop)
 1. [Deliver](https://raniantheone.github.io/Bookkeeping_Nodejs/deliver)
 
-The content is mainly actual steps on how I do these things, serving as a memo. If any kind folks is reading these and have something to say, please open a issue; I am more than happy if anyone want to suggest anything, and many thanks in advance.
+Most of the content are memos on actual steps about how I do these things. If any kind folk is reading these and has something to say, please open an issue; I am more than happy if anyone want to suggest anything, and many thanks in advance.

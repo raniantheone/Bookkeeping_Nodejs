@@ -2,7 +2,7 @@
 Simple bookkeeping web application built with Nodejs
 
 ## Why Build This
-First, an app/service that meet my bookkeeping need is hard to find. I have used several bookkeeping apps before, but after spending a few months with each of them, it always turned out that they are either equipped with too much redundant features for me (sharing how much I saved this month to facebook?!), or having fundamental principle which does not suit me, e.g. same category cannot be shared by different account.
+First, an app/service that meet my bookkeeping need is hard to find. I have used several bookkeeping apps before, but after spending a few months with each of them, it always turned out that they are either equipped with too much redundant features for me (huge report on mobile screen that makes it hard to read the numbers), or having fundamental principle which does not suit me, e.g. same category cannot be shared by different account.
 
 Second, this little piece of work might help other people. Since somebody else have the same issue stated above, well at least my wife does, I figure it should feel rewarding to provide a solution and see it do some good.
 
